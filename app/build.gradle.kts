@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.androidx.navigation.safeargs)
     id("com.google.gms.google-services")
+    kotlin("kapt")
+    id("kotlin-kapt")
 }
 
 android {
@@ -65,4 +67,6 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.android)
 }
