@@ -30,6 +30,11 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -57,4 +62,7 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
