@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.example.letitcook.MainActivity
 import com.example.letitcook.R
@@ -47,23 +48,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         authViewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
 
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString()
-            val password = binding.etPassword.text.toString()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
 
             if (email.isBlank() || password.isBlank()) {
                 Toast.makeText(requireContext(), "Email and Password cannot be empty", Toast.LENGTH_SHORT).show()
             } else {
                 authViewModel.login(email, password)
-            }
-        }
-
-        // Checks if the login was successful
-        authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
-            if (result.success) {
-                requireActivity().finish()
-                startActivity(Intent(requireContext(), MainActivity::class.java))
-            } else {
-                Toast.makeText(requireContext(), result.errorMessage ?: "Login failed", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -79,8 +70,30 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         _binding = null
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Checks if the login was successful
+        authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
+            if (result.success) {
+                authViewModel.resetLoginState()
+
+                // WAIT for the view to be ready
+                view.post {
+                    // Check if the fragment is still valid before navigating
+                    if (isAdded) {
+                        try {
+                            findNavController().navigate(R.id.action_login_to_home)
+                        } catch (e: Exception) {
+                            // This catches any remaining "not found" errors without crashing
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), result.errorMessage ?: "Login failed", Toast.LENGTH_SHORT).show()
+            }
+        }
 //        val btnLogin = view.findViewById<Button>(R.id.btnLogin)
 //        val tvSignUp = view.findViewById<TextView>(R.id.tvSignUp)
 //
@@ -96,5 +109,5 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 //                LoginFragmentDirections.actionLoginToRegister()
 //            findNavController().navigate(action)
 //        }
-//    }
+    }
 }

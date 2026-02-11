@@ -27,9 +27,15 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     fun register(email: String, password: String, profileImageUri: Uri?) {
         viewModelScope.launch {
-            val result = authRepository.register(email, password, profileImageUri)
+            val result = authRepository.register(email, password ) //, profileImageUri)
             _registrationResult.postValue(result)
         }
+    }
+
+    fun resetLoginState() {
+        // Reset the value so it doesn't trigger again automatically
+        _loginResult.value = Result(success = false, errorMessage = null)
+        // OR if your LiveData is nullable: _loginResult.value = null
     }
 }
 
