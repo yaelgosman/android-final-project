@@ -1,23 +1,16 @@
 package com.example.letitcook.ui.auth
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import com.example.letitcook.MainActivity
 import com.example.letitcook.R
 import com.example.letitcook.data.AuthRepository
 import com.example.letitcook.databinding.FragmentLoginBinding
-import dagger.hilt.android.AndroidEntryPoint;
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,15 +52,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         binding.tvSignUp.setOnClickListener {
-            parentFragmentManager.beginTransaction().replace(R.id.auth_container, RegisterFragment()).addToBackStack(null).commit()
+            findNavController().navigate(R.id.action_login_to_register)
         }
 
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,38 +64,27 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         // Checks if the login was successful
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
             if (result.success) {
-                authViewModel.resetLoginState()
+                try {
 
-                // WAIT for the view to be ready
-                view.post {
-                    // Check if the fragment is still valid before navigating
-                    if (isAdded) {
-                        try {
-                            findNavController().navigate(R.id.action_login_to_home)
-                        } catch (e: Exception) {
-                            // This catches any remaining "not found" errors without crashing
-                            e.printStackTrace()
-                        }
-                    }
+                    // this part inside the navigation Removes the login page from the page stack - to prevent the user from returning to it after successful login.
+                    findNavController().navigate(
+                        R.id.action_login_to_home,
+                        null,
+                        androidx.navigation.NavOptions.Builder()
+                            .setPopUpTo(R.id.loginFragment, true) // Remove loginFragment from history
+                            .build()
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             } else {
                 Toast.makeText(requireContext(), result.errorMessage ?: "Login failed", Toast.LENGTH_SHORT).show()
             }
         }
-//        val btnLogin = view.findViewById<Button>(R.id.btnLogin)
-//        val tvSignUp = view.findViewById<TextView>(R.id.tvSignUp)
-//
-//        btnLogin.setOnClickListener {
-//            // פיקטיבי – תמיד מצליח
-//            val action =
-//                LoginFragmentDirections.actionLoginToHome()
-//            findNavController().navigate(action)
-//        }
-//
-//        tvSignUp.setOnClickListener {
-//            val action =
-//                LoginFragmentDirections.actionLoginToRegister()
-//            findNavController().navigate(action)
-//        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
