@@ -70,4 +70,8 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.room.common)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.work.runtime)
 }
