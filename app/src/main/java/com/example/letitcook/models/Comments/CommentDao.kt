@@ -11,7 +11,8 @@ import com.example.letitcook.models.Comment
 interface CommentDao {
 
     @Query("SELECT * FROM comments")
-    fun getAllComments(): List<CommentEntity> // TODO: check if it should be Comment and not CommentEntity
+    fun getAllComments(): List<CommentEntity>
+    // TODO: check if it should be Comment and not CommentEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addComment(comment: Comment)
