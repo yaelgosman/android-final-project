@@ -5,7 +5,7 @@ import com.example.letitcook.data.FakeRepository
 import com.example.letitcook.model.Post
 
 class HomeViewModel : ViewModel() {
-    private val repository = FakeRepository()
+//    private val repository = FakeRepository.getPosts()
 
-    val posts: List<Post> = repository.getPosts()
+    val posts: List<Post> = FakeRepository.getPosts()
 }
