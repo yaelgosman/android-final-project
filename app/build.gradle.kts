@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.androidx.navigation.safeargs)
     id("com.google.gms.google-services")
+    kotlin("kapt")
+    id("kotlin-kapt")
 }
 
 android {
@@ -58,6 +60,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.coroutines.core)
@@ -65,4 +68,6 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.android)
 }
