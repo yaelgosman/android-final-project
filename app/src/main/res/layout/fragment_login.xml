@@ -4,15 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- תמונת רקע - שימי תמונה יפה ב-drawable בשם login_bg -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/login_background"
-        app:tint="@color/dark_overlay" />
+         />
 
-    <!-- כותרת -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"

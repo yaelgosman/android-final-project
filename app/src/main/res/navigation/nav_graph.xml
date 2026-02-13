@@ -3,49 +3,77 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment"> <!-- 1. הפניה למסך הראשון -->
+    app:startDestination="@id/loginFragment">
 
+    <!-- Auth Screens -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.letitcook.ui.auth.LoginFragment"
-        android:label="Login Screen"
-        tools:layout="@layout/fragment_login" >
-
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_login_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <!-- prevents the user to go back to the login page when the user is logged in -->
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
-
-        <action
-            android:id="@+id/action_login_to_home"
-            app:destination="@id/homeFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.letitcook.ui.auth.RegisterFragment"
         android:label="Register">
-
         <action
             android:id="@+id/action_register_to_home"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
 
         <action
             android:id="@+id/action_register_to_login"
             app:destination="@id/loginFragment" />
     </fragment>
 
+    <!-- Main Screens (Bottom Nav) -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.letitcook.ui.feed.HomeFragment"
         android:label="Home" />
 
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.letitcook.ui.search.SearchFragment"
+        android:label="Search">
+        <!-- מאפשר מעבר לפרטי מסעדה -->
+<!--        <action-->
+<!--            android:id="@+id/action_search_to_details"-->
+<!--            app:destination="@id/restaurantDetailsFragment" />-->
+    </fragment>
+
+
+<!--    <fragment-->
+<!--        android:id="@+id/savedFragment"-->
+<!--        android:name="com.example.letitcook.ui.saved.SavedFragment"-->
+<!--        android:label="Saved" />-->
+
+<!--    <fragment-->
+<!--        android:id="@+id/profileFragment"-->
+<!--        android:name="com.example.letitcook.ui.profile.ProfileFragment"-->
+<!--        android:label="Profile" />-->
+
+    <!-- Add Review Screen (נפתח מהכפתור האדום) -->
+    <fragment
+        android:id="@+id/addReviewFragment"
+        android:name="com.example.letitcook.ui.addReview.AddReviewFragment"
+        android:label="Add Review" />
+
+    <!-- Placeholder for Details if needed -->
+<!--    <fragment-->
+<!--        android:id="@+id/restaurantDetailsFragment"-->
+<!--        android:name="com.example.letitcook.ui.details.RestaurantDetailsFragment"-->
+<!--        android:label="Details" />-->
+
 </navigation>
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<navigation xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--    android:id="@+id/nav_graph"-->
-    <!--    app:startDestination="@id/placeholder1">-->
-
-    <!--    <fragment android:id="@+id/placeholder1" />-->
-    <!--</navigation>-->
