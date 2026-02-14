@@ -21,38 +21,14 @@ class AuthRepository(private val context: Context) {
 
 //    private val api = NetworkModule.retrofit.create<AuthApiService>()
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("LetItCookPrefs", Context.MODE_PRIVATE)
+//    private val sharedPreferences: SharedPreferences =
+//        context.getSharedPreferences("LetItCookPrefs", Context.MODE_PRIVATE)
 
     fun isUserLoggedIn(): Boolean {
-        val accessToken = sharedPreferences.getString("accessToken", null)
-        return accessToken != null && !isTokenExpired(accessToken)
+//        val accessToken = sharedPreferences.getString("accessToken", null)
+//        return accessToken != null && !isTokenExpired(accessToken)
+        return firebaseAuth.currentUser != null
     }
-
-//    suspend fun login(email: String, password: String): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val response = api.login(LoginRequest(email, password))
-//                saveTokens(response.token, response.refreshToken)
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
-
-//    suspend fun register(email: String, password: String, profileImageUri: Uri?): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val response = api.register(RegisterRequest(email, password, profileImageUri))
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
 
     // Function to login
     suspend fun login(email: String, pass: String): Result {
@@ -82,42 +58,9 @@ class AuthRepository(private val context: Context) {
         }
     }
 
-//    suspend fun logout(): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                api.logout()
-//                clearTokens()
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
-//
-//    suspend fun refreshToken(): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val response = api.refreshToken()
-//                saveTokens(response.token, response.refreshToken)
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
-
-    private fun saveTokens(accessToken: String?, refreshToken: String?) {
-        sharedPreferences.edit().apply {
-            putString("accessToken", accessToken)
-            putString("refreshToken", refreshToken)
-            apply()
-        }
-    }
-
-    private fun clearTokens() {
-        sharedPreferences.edit().clear().apply()
+    // Function to sign out the logged user
+    fun logout() {
+        firebaseAuth.signOut()
     }
 
     private fun isTokenExpired(token: String): Boolean {
