@@ -8,6 +8,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.letitcook.databinding.ActivityMainBinding
 import com.example.letitcook.R
+import com.example.letitcook.data.AuthRepository
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 
@@ -28,6 +29,21 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
+
+        val authRepository = AuthRepository(this)
+
+//        Inflate the graph manually so we can edit the start destination (if the user is already logged in)
+        val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+
+        if (authRepository.isUserLoggedIn()) {
+            // User is logged in -> start at Home page
+            navGraph.setStartDestination(R.id.homeFragment)
+        } else {
+            // User is NOT logged in -> Start at Login page
+            navGraph.setStartDestination(R.id.loginFragment)
+        }
+
+        navController.graph = navGraph
 
         binding.bottomNavigationView.setupWithNavController(navController)
 

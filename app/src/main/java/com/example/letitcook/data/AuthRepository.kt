@@ -1,17 +1,15 @@
 package com.example.letitcook.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
-import com.example.letitcook.network.NetworkModule
 import com.example.letitcook.utils.ErrorParser
 import com.example.letitcook.utils.Result
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import retrofit2.create
+import com.example.letitcook.utils.ImageUtils
 
 data class LoginRequest(val email: String, val password: String)
 data class RegisterRequest(val email: String, val password: String, val profileImage: Uri?)
@@ -19,40 +17,12 @@ data class AuthResponse(val token: String?, val refreshToken: String?, val messa
 
 class AuthRepository(private val context: Context) {
 
-//    private val api = NetworkModule.retrofit.create<AuthApiService>()
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("LetItCookPrefs", Context.MODE_PRIVATE)
+    private val storage = FirebaseStorage.getInstance()
 
     fun isUserLoggedIn(): Boolean {
-        val accessToken = sharedPreferences.getString("accessToken", null)
-        return accessToken != null && !isTokenExpired(accessToken)
+        return firebaseAuth.currentUser != null
     }
-
-//    suspend fun login(email: String, password: String): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val response = api.login(LoginRequest(email, password))
-//                saveTokens(response.token, response.refreshToken)
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
-
-//    suspend fun register(email: String, password: String, profileImageUri: Uri?): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val response = api.register(RegisterRequest(email, password, profileImageUri))
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
 
     // Function to login
     suspend fun login(email: String, pass: String): Result {
@@ -60,7 +30,6 @@ class AuthRepository(private val context: Context) {
             firebaseAuth.signInWithEmailAndPassword(email, pass).await()
             Result(success = true)
         } catch (e: Exception) {
-
             // Log the error to your Logcat so you can see it
             e.printStackTrace()
 
@@ -71,10 +40,39 @@ class AuthRepository(private val context: Context) {
     }
 
     // Function to register a user
-    suspend fun register(email: String, pass: String): Result {
+    suspend fun register(email: String, pass: String, name: String, imageUri: Uri?): Result {
         return try {
             // This talks directly to Google, no localhost needed
-            firebaseAuth.createUserWithEmailAndPassword(email, pass).await()
+            // this creates the user in Firebase Auth
+            val authResult = firebaseAuth.createUserWithEmailAndPassword(email, pass).await()
+            val user = authResult.user
+
+            var downloadUrl: Uri? = null
+
+            // If the user picked an image, upload it to the Storage
+            if (imageUri != null && user != null) {
+                //Create a reference: images/USER_ID.jpg
+                val storageRef = storage.reference.child("profile_images/${user.uid}.jpg")
+
+                // Convert URI -> Rotated Byte array (to prevent android bugs where the image is saved ROTATED)
+                val data = ImageUtils.prepareImageForUpload(context, imageUri)
+
+
+                // Upload the ByteArray (instead of putFie)
+                storageRef.putBytes(data).await()
+
+                // Get the download URL
+                downloadUrl = storageRef.downloadUrl.await()
+            }
+
+            // Update the User's Profile (Name + Photo URL)
+            val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(name)
+                .setPhotoUri(downloadUrl) // Will work even if null
+                .build()
+
+            // Updates the user with the name and photo.
+            user?.updateProfile(profileUpdates)?.await()
+
             Result(success = true)
         } catch (e: Exception) {
             val errorMessage = ErrorParser.parseHttpError(e)
@@ -82,42 +80,9 @@ class AuthRepository(private val context: Context) {
         }
     }
 
-//    suspend fun logout(): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                api.logout()
-//                clearTokens()
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
-//
-//    suspend fun refreshToken(): Result {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val response = api.refreshToken()
-//                saveTokens(response.token, response.refreshToken)
-//                Result(success = true)
-//            } catch (e: Exception) {
-//                val errorMessage = ErrorParser.parseHttpError(e)
-//                Result(success = false, errorMessage = errorMessage)
-//            }
-//        }
-//    }
-
-    private fun saveTokens(accessToken: String?, refreshToken: String?) {
-        sharedPreferences.edit().apply {
-            putString("accessToken", accessToken)
-            putString("refreshToken", refreshToken)
-            apply()
-        }
-    }
-
-    private fun clearTokens() {
-        sharedPreferences.edit().clear().apply()
+    // Function to sign out the logged user
+    fun logout() {
+        firebaseAuth.signOut()
     }
 
     private fun isTokenExpired(token: String): Boolean {

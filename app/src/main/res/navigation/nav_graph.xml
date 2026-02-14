@@ -59,10 +59,11 @@
 <!--        android:name="com.example.letitcook.ui.saved.SavedFragment"-->
 <!--        android:label="Saved" />-->
 
-<!--    <fragment-->
-<!--        android:id="@+id/profileFragment"-->
-<!--        android:name="com.example.letitcook.ui.profile.ProfileFragment"-->
-<!--        android:label="Profile" />-->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.letitcook.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
 
     <!-- Add Review Screen (נפתח מהכפתור האדום) -->
     <fragment
