@@ -7,6 +7,8 @@ import com.bumptech.glide.Glide
 import com.example.letitcook.databinding.ItemPostBinding
 import com.example.letitcook.model.Post
 import com.example.letitcook.R
+import com.example.letitcook.utils.ImageUtils
+import android.view.View
 
 class PostsAdapter(
     private val posts: List<Post>
@@ -38,6 +40,32 @@ class PostsAdapter(
 //                .load(post.postImageUrl)
 //                .placeholder(R.drawable.ic_post_placeholder)
 //                .into(ivPostImage)
+        }
+
+        // Handles the image loading
+        if (post.postImageUrl != null) {
+            holder.binding.ivPostImage.visibility = View.VISIBLE
+
+            val isLocalUri = post.postImageUrl.startsWith("content://") //Checks if its a local image from the gallery or from the web
+            var request = com.squareup.picasso.Picasso.get().load(post.postImageUrl)
+
+            // If local, apply the rotation fix using your Utils
+            if (isLocalUri) {
+                var uri = android.net.Uri.parse(post.postImageUrl)
+                val rotation = ImageUtils.getRotationAngle(holder.itemView.context, uri)
+                request = request.rotate((rotation))
+            }
+
+            // Load with standard settings
+            request
+                .fit()
+                .centerCrop()
+                .placeholder(R.drawable.bg_dashed_border) // Show placeholder while loading
+                .into(holder.binding.ivPostImage)
+
+        } else {
+                // Hide image view if the post has no photo
+//                holder.binding.ivPostImage.visibility = View.GONE
         }
     }
 

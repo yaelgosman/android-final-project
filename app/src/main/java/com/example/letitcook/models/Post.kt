@@ -6,6 +6,6 @@ data class Post(
     val location: String,
     val description: String,
     val rating: Float,
-    val userAvatarUrl: String?,
-    val postImageUrl: String?
+    val userAvatarUrl: String? = null,
+    val postImageUrl: String? = null
 )
