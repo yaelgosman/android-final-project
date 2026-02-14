@@ -54,6 +54,36 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivProfilePreview"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="centerCrop"
+                    android:padding="0dp"
+                    app:shapeAppearanceOverlay="@style/CircleImage"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#BDBDBD"
+                    tools:src="@tools:sample/avatars" />
+
+                <ImageView
+                    android:id="@+id/btnUploadImage"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/circle_white_bg"
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:padding="6dp"
+                    app:tint="@color/black"
+                    android:elevation="4dp"/>
+            </FrameLayout>
+
+
             <EditText
                 android:id="@+id/etFullName"
                 android:layout_width="match_parent"

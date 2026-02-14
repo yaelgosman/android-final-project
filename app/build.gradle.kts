@@ -86,4 +86,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.squareup.picasso:picasso:2.8")
 }

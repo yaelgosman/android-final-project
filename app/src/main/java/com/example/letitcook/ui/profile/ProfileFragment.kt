@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
 import com.example.letitcook.data.AuthRepository
 import com.example.letitcook.databinding.FragmentProfileBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Picasso
 
 class ProfileFragment : Fragment() {
 
@@ -30,6 +32,26 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Get the current user
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user != null) {
+            // Set the user's name
+            binding.tvProfileName.text = user.displayName?.uppercase() ?: "No Name" //check if maybe just insert their email instead?
+            binding.tvHeaderName.text = user.displayName ?: "User"
+
+            // Set the pfp
+            if (user.photoUrl != null) {
+                Picasso.get().load(user.photoUrl)
+                    .fit().centerCrop()
+                    .placeholder(R.drawable.ic_person) // creates a dummy placeholder
+                    .into(binding.ivProfileImage)
+            } else {
+                // If no image, sets a default pfp for the user
+                binding.ivProfileImage.setImageResource(R.drawable.ic_person)
+            }
+        }
+
         // Setup the Settings (Gear) Icon
         binding.ivSettings.setOnClickListener { view ->
             showSettingsMenu(view)
@@ -38,13 +60,13 @@ class ProfileFragment : Fragment() {
         // Setup Edit Profile Button
         binding.btnEditProfile.setOnClickListener {
             Toast.makeText(context, "Edit Profile Clicked", Toast.LENGTH_SHORT).show()
-            // Navigate to EditProfileFragment if you have one
+            // TODO Navigate to EditProfileFragment in the future
         }
     }
 
     private fun showSettingsMenu(view: View) {
         val popup = PopupMenu(requireContext(), view)
-        // Inflate a menu resource if you have one, or add explicitly like this:
+        // Inflate the menu resources:
         popup.menu.add(0, 1, 0, "Settings")
         popup.menu.add(0, 2, 0, "Log Out")
 
