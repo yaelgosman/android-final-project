@@ -7,4 +7,7 @@
     <color name="dark_overlay">#80000000</color>
     <color name="transparent_white">#B3FFFFFF</color>
     <color name="green_rating">#2ecc71</color>
+    <color name="darker_gray">#666666</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="red_primary">#F44336</color>
 </resources>
