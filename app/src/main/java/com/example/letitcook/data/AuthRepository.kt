@@ -30,7 +30,6 @@ class AuthRepository(private val context: Context) {
             firebaseAuth.signInWithEmailAndPassword(email, pass).await()
             Result(success = true)
         } catch (e: Exception) {
-            // Log the error to your Logcat so you can see it
             e.printStackTrace()
 
             val errorMessage = ErrorParser.parseHttpError(e)
@@ -42,7 +41,6 @@ class AuthRepository(private val context: Context) {
     // Function to register a user
     suspend fun register(email: String, pass: String, name: String, imageUri: Uri?): Result {
         return try {
-            // This talks directly to Google, no localhost needed
             // this creates the user in Firebase Auth
             val authResult = firebaseAuth.createUserWithEmailAndPassword(email, pass).await()
             val user = authResult.user
@@ -83,6 +81,40 @@ class AuthRepository(private val context: Context) {
     // Function to sign out the logged user
     fun logout() {
         firebaseAuth.signOut()
+    }
+
+    // Function to update user profile details
+    suspend fun updateUserProfile(name: String, imageUri: Uri?): Result {
+        return try {
+            val user = firebaseAuth.currentUser ?: return Result(success = false, errorMessage = "User not found")
+
+            var downloadUrl: Uri? = user.photoUrl // Default to existing URL
+
+            // If a NEW image was picked, upload it
+            if (imageUri != null) {
+                val storageRef = storage.reference.child("profile_images/${user.uid}.jpg")
+                val imageData = ImageUtils.prepareImageForUpload(context, imageUri)
+
+                storageRef.putBytes(imageData).await()
+                downloadUrl = storageRef.downloadUrl.await()
+            }
+
+            // Update Firebase Auth Profile
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setDisplayName(name)
+                .setPhotoUri(downloadUrl)
+                .build()
+
+            user.updateProfile(profileUpdates).await()
+
+            // Force refresh so the UI sees the change immediately
+            user.reload().await()
+
+            Result(success = true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result(success = false, errorMessage = e.message ?: "Update failed")
+        }
     }
 
     private fun isTokenExpired(token: String): Boolean {

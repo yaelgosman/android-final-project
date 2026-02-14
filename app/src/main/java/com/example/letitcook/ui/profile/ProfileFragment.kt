@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
 import com.example.letitcook.data.AuthRepository
 import com.example.letitcook.databinding.FragmentProfileBinding
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
@@ -54,36 +54,29 @@ class ProfileFragment : Fragment() {
 
         // Setup the Settings (Gear) Icon
         binding.ivSettings.setOnClickListener { view ->
-            showSettingsMenu(view)
-        }
-
-        // Setup Edit Profile Button
-        binding.btnEditProfile.setOnClickListener {
-            Toast.makeText(context, "Edit Profile Clicked", Toast.LENGTH_SHORT).show()
-            // TODO Navigate to EditProfileFragment in the future
+            showSettingsBottomSheet()
         }
     }
 
-    private fun showSettingsMenu(view: View) {
-        val popup = PopupMenu(requireContext(), view)
-        // Inflate the menu resources:
-        popup.menu.add(0, 1, 0, "Settings")
-        popup.menu.add(0, 2, 0, "Log Out")
+    // Handles the Open Settings menu on user click
+    private fun showSettingsBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_settings, null)
+        dialog.setContentView(view)
 
-        popup.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                1 -> {
-                    // Handle Settings click
-                    true
-                }
-                2 -> {
-                    performLogout()
-                    true
-                }
-                else -> false
-            }
+        // Handle "Edit Profile" Click
+        view.findViewById<View>(R.id.btn_bs_edit).setOnClickListener {
+            dialog.dismiss() // Closes the settings menu
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
         }
-        popup.show()
+
+        // Handle "Log Out" Click
+        view.findViewById<View>(R.id.btn_bs_logout).setOnClickListener {
+            dialog.dismiss()
+            performLogout() // Calls the logout function
+        }
+
+        dialog.show()
     }
 
     private fun performLogout() {
