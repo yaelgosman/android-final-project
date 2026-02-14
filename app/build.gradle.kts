@@ -70,7 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
@@ -88,4 +88,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

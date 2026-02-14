@@ -3,7 +3,6 @@ package com.example.letitcook.ui.feed
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.letitcook.databinding.ItemPostBinding
 import com.example.letitcook.model.Post
 import com.example.letitcook.R
@@ -14,6 +13,8 @@ class PostsAdapter(
     private val posts: List<Post>
 ) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
+    private var postList: List<Post> = posts
+
     class PostViewHolder(val binding: ItemPostBinding) :
         RecyclerView.ViewHolder(binding.root)
 
@@ -23,7 +24,7 @@ class PostsAdapter(
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = posts[position]
+        val post = postList[position]
 
         with(holder.binding) {
             tvUserName.text = post.userName
@@ -94,5 +95,10 @@ class PostsAdapter(
         }
     }
 
-    override fun getItemCount(): Int = posts.size
+    fun updatePosts(newPosts: List<Post>) {
+        this.postList = newPosts
+        notifyDataSetChanged() // Tells the recycler to redraw itself with real data
+    }
+
+    override fun getItemCount(): Int = postList.size
 }

@@ -9,6 +9,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
@@ -87,5 +90,24 @@ class PostRepository(private val context: Context) {
             e.printStackTrace()
             emptyList()
         }
+    }
+
+    // TEST FUNCTION!!
+    fun getPostsRealTime(): Flow<List<Post>> = callbackFlow {
+        val subscription = db.collection(POSTS_COLLECTION)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val posts = snapshot?.toObjects(Post::class.java) ?: emptyList()
+                // Map the IDs like you did before
+                snapshot?.documents?.forEachIndexed { index, doc ->
+                    posts.getOrNull(index)?.id = doc.id
+                }
+                trySend(posts)
+            }
+        awaitClose { subscription.remove() }
     }
 }
