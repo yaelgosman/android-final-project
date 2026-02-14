@@ -21,6 +21,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.squareup.picasso.Picasso
 import com.example.letitcook.utils.ImageUtils
 import com.google.firebase.auth.FirebaseAuth
+import com.example.letitcook.data.PostRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
@@ -41,6 +45,7 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddReviewBinding.bind(view)
+        val repository = PostRepository(requireContext())
 
         // Fetch Restaurants from yelp instead of Fake Repository
         fetchRestaurants("New York") // for now its new york because i dont think there are and israeli location restaurants in yelp...
@@ -54,7 +59,6 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         }
 
         binding.btnPost.setOnClickListener {
-            // כאן נאסוף את הנתונים
             val selectedRestaurant = binding.autoCompleteRestaurant.text.toString()
             val rating = binding.ratingBar.rating
             val text = binding.etDescription.text.toString()
@@ -64,23 +68,50 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 return@setOnClickListener
             }
 
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            // For now: saves the new post to the fakeRepository vv
+            // Disables the button so the user doesn't click twice
+            binding.btnPost.isEnabled = false
+            binding.btnPost.text = "COOKING..." // For UI reactivity
 
-            // שמירה ב-FakeRepository (ובעתיד לפיירבייס)
-            // FakeRepository.addPost(....)
-            //viewModel.addPost
-            FakeRepository.addPost(
-                userName = currentUser?.displayName.toString(),
-                location = binding.tilRestaurant.editText?.text.toString(),
-                description = binding.etDescription.text.toString(),
-                rating = binding.ratingBar.rating,
-                userAvatarUrl = currentUser?.photoUrl,
-                postImageUrl = selectedImageUri
-            )
+            // Launch in Background
+            lifecycleScope.launch(Dispatchers.IO) {
 
-            Toast.makeText(context, "Review posted!", Toast.LENGTH_SHORT).show()
-            findNavController().popBackStack()
+                val result = repository.addPost(
+                    location = selectedRestaurant,
+                    description = text,
+                    rating = rating,
+                    imageUri = selectedImageUri
+                )
+
+                withContext(Dispatchers.Main) {
+                    binding.btnPost.isEnabled = true
+
+                    if (result.success) {
+                        Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                    } else {
+                        Toast.makeText(context, "Error: ${result.errorMessage}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+//            --------------------------------------------------------------- Fake Repo part v
+//            val currentUser = FirebaseAuth.getInstance().currentUser
+//            // For now: saves the new post to the fakeRepository vv
+//
+//            // שמירה ב-FakeRepository (ובעתיד לפיירבייס)
+//            // FakeRepository.addPost(....)
+//            //viewModel.addPost
+//            FakeRepository.addPost(
+//                userName = currentUser?.displayName.toString(),
+//                location = binding.tilRestaurant.editText?.text.toString(),
+//                description = binding.etDescription.text.toString(),
+//                rating = binding.ratingBar.rating,
+//                userAvatarUrl = currentUser?.photoUrl,
+//                postImageUrl = selectedImageUri
+//            )
+//
+//            Toast.makeText(context, "Review posted!", Toast.LENGTH_SHORT).show()
+//            findNavController().popBackStack()
         }
 
         binding.imageContainer.setOnClickListener {
