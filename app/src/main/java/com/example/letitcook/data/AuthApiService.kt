@@ -1,5 +1,8 @@
 package com.example.letitcook.data
 
+import com.example.letitcook.data.repository.AuthResponse
+import com.example.letitcook.data.repository.LoginRequest
+import com.example.letitcook.data.repository.RegisterRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
 

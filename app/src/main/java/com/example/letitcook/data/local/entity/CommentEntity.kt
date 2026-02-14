@@ -1,4 +1,4 @@
-package com.example.letitcook.models.Comments
+package com.example.letitcook.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

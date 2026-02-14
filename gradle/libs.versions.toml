@@ -18,6 +18,7 @@ roomCommon = "2.6.1"
 roomKtx = "2.6.1"
 roomRuntime = "2.6.1"
 workRunTime = "2.7.1"
+firebaseFirestoreKtx = "26.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

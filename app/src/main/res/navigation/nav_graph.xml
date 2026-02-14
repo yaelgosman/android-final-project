@@ -40,7 +40,7 @@
     <!-- Main Screens (Bottom Nav) -->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.letitcook.ui.feed.HomeFragment"
+        android:name="com.example.letitcook.ui.home.HomeFragment"
         android:label="Home" />
 
     <fragment
@@ -67,7 +67,7 @@
     <!-- Add Review Screen (נפתח מהכפתור האדום) -->
     <fragment
         android:id="@+id/addReviewFragment"
-        android:name="com.example.letitcook.ui.addReview.AddReviewFragment"
+        android:name="com.example.letitcook.ui.addPost.AddPostFragment"
         android:label="Add Review" />
 
     <!-- Placeholder for Details if needed -->

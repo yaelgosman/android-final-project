@@ -1,54 +1,14 @@
 package com.example.letitcook.data
 
-import com.example.letitcook.model.Post
-import com.example.letitcook.models.Restaurant
-import java.util.UUID
+data class Restaurant(
+    val id: String,
+    val name: String,
+    val type: String,
+    val rating: String,
+    val imageUrl: String
+)
 
 object FakeRepository {
-
-    private val posts = mutableListOf(
-        Post(
-            id = UUID.randomUUID().toString(),
-            userName = "Guy Levi",
-            location = "Burger Saloon • Tel Aviv",
-            description = "Best burger in town 🍔",
-            rating = 9.5f,
-            userAvatarUrl = null,
-            postImageUrl = null
-        ),
-        Post(
-            id = UUID.randomUUID().toString(),
-            userName = "Dana Cohen",
-            location = "Pasta Basta • Haifa",
-            description = "Amazing creamy pasta 🍝",
-            rating = 8.7f,
-            userAvatarUrl = null,
-            postImageUrl = null
-        )
-    )
-
-    fun getPosts(): List<Post> = posts
-
-    fun addPost(
-        userName: String,
-        location: String,
-        description: String,
-        rating: Float
-    ) {
-        posts.add(
-            0,
-            Post(
-                id = UUID.randomUUID().toString(),
-                userName = userName,
-                location = location,
-                description = description,
-                rating = rating,
-                userAvatarUrl = null,
-                postImageUrl = null
-            )
-        )
-    }
-
     private val restaurants = listOf(
         Restaurant("1", "Raffaello", "Italian • $$$", "4.8", "https://images.unsplash.com/photo-1568901346375-23c9450c58cd"),
         Restaurant("2", "Vitrina", "Hamburgers • $$", "4.7", "https://images.unsplash.com/photo-1555939594-58d7cb561ad1"),

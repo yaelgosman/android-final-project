@@ -1,33 +1,44 @@
-package com.example.letitcook.data
+package com.example.letitcook.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import com.example.letitcook.network.NetworkModule
+import android.util.Base64
 import com.example.letitcook.utils.ErrorParser
 import com.example.letitcook.utils.Result
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import retrofit2.create
 
 data class LoginRequest(val email: String, val password: String)
 data class RegisterRequest(val email: String, val password: String, val profileImage: Uri?)
 data class AuthResponse(val token: String?, val refreshToken: String?, val message: String?)
 
-class AuthRepository(private val context: Context) {
+class AuthRepository {
 
 //    private val api = NetworkModule.retrofit.create<AuthApiService>()
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("LetItCookPrefs", Context.MODE_PRIVATE)
+
+    companion object {
+        val instance = AuthRepository()
+    }
 
     fun isUserLoggedIn(): Boolean {
-        val accessToken = sharedPreferences.getString("accessToken", null)
-        return accessToken != null && !isTokenExpired(accessToken)
+        return firebaseAuth.currentUser != null
     }
+
+    fun getCurrentUserId(): String {
+        return firebaseAuth.currentUser?.uid ?: ""
+    }
+
+    fun getCurrentUserEmail(): String {
+        return firebaseAuth.currentUser?.email ?: ""
+    }
+
+    fun getCurrentUserName(): String {
+        return firebaseAuth.currentUser?.displayName ?: "User"
+    }
+
 
 //    suspend fun login(email: String, password: String): Result {
 //        return withContext(Dispatchers.IO) {
@@ -108,23 +119,12 @@ class AuthRepository(private val context: Context) {
 //        }
 //    }
 
-    private fun saveTokens(accessToken: String?, refreshToken: String?) {
-        sharedPreferences.edit().apply {
-            putString("accessToken", accessToken)
-            putString("refreshToken", refreshToken)
-            apply()
-        }
-    }
-
-    private fun clearTokens() {
-        sharedPreferences.edit().clear().apply()
-    }
 
     private fun isTokenExpired(token: String): Boolean {
         return try {
             val parts = token.split(".")
             if (parts.size != 3) return true
-            val payload = String(android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE))
+            val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
             val json = JSONObject(payload)
             val exp = json.optLong("exp", 0)
             System.currentTimeMillis() / 1000 >= exp

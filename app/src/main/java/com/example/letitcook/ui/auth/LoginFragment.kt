@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.data.repository.AuthRepository
 import com.example.letitcook.databinding.FragmentLoginBinding
 
 // TODO: Rename parameter arguments, choose names that match
@@ -37,7 +37,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        val factory = AuthViewModelFactory(AuthRepository(requireContext()))
+        val factory = AuthViewModelFactory(AuthRepository.instance)
         authViewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
 
         binding.btnLogin.setOnClickListener {

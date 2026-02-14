@@ -5,14 +5,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.letitcook.MainActivity
 import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.data.repository.AuthRepository
 
 class AuthenticationActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val authRepository = AuthRepository(this)
+        val authRepository = AuthRepository.instance
 
         if (authRepository.isUserLoggedIn()) {
             navigateToMainActivity()

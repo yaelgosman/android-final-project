@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.data.repository.AuthRepository
 import com.example.letitcook.databinding.FragmentRegisterBinding
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
@@ -38,7 +36,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
 
         // Initialize ViewModel using your existing factory pattern
-        val factory = AuthViewModelFactory(AuthRepository(requireContext()))
+        val factory = AuthViewModelFactory(AuthRepository.instance)
         authViewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
 
         binding.btnRegister.setOnClickListener {
