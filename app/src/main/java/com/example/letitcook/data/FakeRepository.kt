@@ -35,6 +35,7 @@ object FakeRepository {
         location: String,
         description: String,
         rating: Float,
+        userAvatarUrl: Uri?,
         postImageUrl: Uri?
     ) {
         posts.add(
@@ -45,7 +46,7 @@ object FakeRepository {
                 location = location,
                 description = description,
                 rating = rating,
-                userAvatarUrl = null,
+                userAvatarUrl = userAvatarUrl?.toString(),
                 postImageUrl = postImageUrl?.toString()
             )
         )

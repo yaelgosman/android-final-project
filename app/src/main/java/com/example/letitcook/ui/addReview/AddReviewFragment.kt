@@ -20,6 +20,8 @@ import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.squareup.picasso.Picasso
 import com.example.letitcook.utils.ImageUtils
+import com.google.firebase.auth.FirebaseAuth
+
 
 class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
 
@@ -62,18 +64,19 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 return@setOnClickListener
             }
 
+            val currentUser = FirebaseAuth.getInstance().currentUser
             // For now: saves the new post to the fakeRepository vv
 
             // שמירה ב-FakeRepository (ובעתיד לפיירבייס)
             // FakeRepository.addPost(....)
             //viewModel.addPost
             FakeRepository.addPost(
-                userName = "You", // TODO: change it later to Firebase.Auth.currentUser!
+                userName = currentUser?.displayName.toString(),
                 location = binding.tilRestaurant.editText?.text.toString(),
                 description = binding.etDescription.text.toString(),
                 rating = binding.ratingBar.rating,
+                userAvatarUrl = currentUser?.photoUrl,
                 postImageUrl = selectedImageUri
-
             )
 
             Toast.makeText(context, "Review posted!", Toast.LENGTH_SHORT).show()

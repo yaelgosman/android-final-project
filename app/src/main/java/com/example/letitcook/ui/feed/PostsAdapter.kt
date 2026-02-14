@@ -28,7 +28,7 @@ class PostsAdapter(
         with(holder.binding) {
             tvUserName.text = post.userName
             tvLocation.text = post.location
-            tvRating.text = "${post.rating} / 10"
+            tvRating.text = "${post.rating} / 5"
             tvDescription.text = post.description
 
 //            Glide.with(root)
@@ -66,6 +66,31 @@ class PostsAdapter(
         } else {
                 // Hide image view if the post has no photo
 //                holder.binding.ivPostImage.visibility = View.GONE
+        }
+
+        // Handles the user pfp
+        if (post.userAvatarUrl != null) {
+            holder.binding.ivAvatar.visibility = View.VISIBLE
+
+            val isLocalUri = post.userAvatarUrl.startsWith("content://") //Checks if its a local image from the gallery or from the web
+            var request = com.squareup.picasso.Picasso.get().load(post.userAvatarUrl)
+
+            // If local, apply the rotation fix using your Utils
+            if (isLocalUri) {
+                var uri = android.net.Uri.parse(post.userAvatarUrl)
+                val rotation = ImageUtils.getRotationAngle(holder.itemView.context, uri)
+                request = request.rotate((rotation))
+            }
+
+            // Load with standard settings
+            request
+                .fit()
+                .centerCrop()
+                .into(holder.binding.ivAvatar)
+
+        } else {
+            // Hide image view if the post has no photo
+//                holder.binding.ivAvatar.visibility = View.GONE
         }
     }
 
