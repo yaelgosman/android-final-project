@@ -1,49 +1,53 @@
 package com.example.letitcook.data.repository
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.example.letitcook.data.local.AppLocalDb
-import com.example.letitcook.data.local.entity.PostEntity
+import com.example.letitcook.data.mapper.toEntity
+import com.example.letitcook.data.mapper.toPost
 import com.example.letitcook.data.remote.firebase.PostsFirebaseService
-import java.util.concurrent.Executors
+import com.example.letitcook.model.Post
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class PostRepository {
 
     private val postDao = AppLocalDb.database.postDao()
     private val firebaseService = PostsFirebaseService()
 
-    private val executor = Executors.newSingleThreadExecutor()
-
     companion object {
         val instance = PostRepository()
     }
 
-    fun getAllPosts(): LiveData<List<PostEntity>> {
-        // refresh from cloud
-        refreshPosts()
-        // get data from room
+    // 🔹 Room is the source of truth
+    fun getAllPosts(): Flow<List<Post>> {
         return postDao.getAllPosts()
+            .map { entities ->
+                entities.map { it.toPost() }
+            } as Flow<List<Post>>
     }
 
-    private fun refreshPosts() {
-        firebaseService.getAllPosts { posts ->
-            executor.execute {
-                postDao.insertAll(posts)
-            }
+    // 🔹 Manual refresh
+    suspend fun refreshPosts() {
+        val remotePosts = firebaseService.getAllPosts()
+        postDao.insertAll(remotePosts.map { it.toEntity() })
+    }
+
+    // 🔹 Realtime sync Firebase → Room
+    suspend fun observeRealtimePosts() {
+        firebaseService.getPostsRealTime().collect { posts ->
+            postDao.insertAll(posts.map { it.toEntity() })
         }
     }
 
-    fun addPost(post: PostEntity, imageUri: Uri?, callback: (Boolean) -> Unit) {
-        firebaseService.addPost(post, imageUri) { success ->
-            if (success) {
-                // אם הצליח בענן -> שומרים גם מקומית
-                // (הערה: כאן אנחנו שומרים את ה-URI המקומי או שנחכה לרענון הבא כדי לקבל את ה-URL מהענן.
-                // כדי שהמשתמש יראה מייד, נשמור את הפוסט המקורי)
-                executor.execute {
-                    postDao.insert(post)
-                }
-            }
-            callback(success)
+    // 🔹 Add post
+    suspend fun addPost(post: Post, imageUri: Uri?): Boolean {
+        val success = firebaseService.addPost(post, imageUri)
+
+        if (success) {
+            postDao.insert(post.toEntity())
         }
+
+        return success
     }
 }

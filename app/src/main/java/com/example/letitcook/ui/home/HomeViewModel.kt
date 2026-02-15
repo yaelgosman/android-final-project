@@ -1,17 +1,27 @@
 package com.example.letitcook.ui.home
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.letitcook.data.local.entity.PostEntity
+import androidx.lifecycle.viewModelScope
 import com.example.letitcook.data.repository.PostRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
+
     private val repository = PostRepository.instance
 
-    val posts: LiveData<List<PostEntity>> = repository.getAllPosts()
+    val posts = repository.getAllPosts()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    fun refresh() {
-        // הריפו עושה את זה אוטומטית ב-getAllPosts,
-        // אבל אפשר לחשוף פונקציית refresh public בריפו אם רוצים
+    init {
+        viewModelScope.launch {
+            repository.refreshPosts()
+            repository.observeRealtimePosts()
+        }
     }
 }

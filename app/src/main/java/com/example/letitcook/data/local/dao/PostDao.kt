@@ -6,11 +6,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.letitcook.data.local.entity.PostEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
     @Query("SELECT * FROM posts ORDER BY timestamp DESC")
-    fun getAllPosts(): LiveData<List<PostEntity>>
+    fun getAllPosts():  Flow<List<PostEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(posts: List<PostEntity>)
