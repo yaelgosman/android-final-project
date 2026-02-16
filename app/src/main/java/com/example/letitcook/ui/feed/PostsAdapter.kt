@@ -70,7 +70,7 @@ class PostsAdapter(
         }
 
         // Handles the user pfp
-        if (post.userAvatarUrl != null) {
+        if (!post.userAvatarUrl.isNullOrEmpty()) {
             holder.binding.ivAvatar.visibility = View.VISIBLE
 
             val isLocalUri = post.userAvatarUrl.startsWith("content://") //Checks if its a local image from the gallery or from the web
