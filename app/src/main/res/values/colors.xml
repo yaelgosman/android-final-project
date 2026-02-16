@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="app_red">#E23744</color>
+    <color name="gray_bg">#F2F2F2</color>
+    <color name="dark_overlay">#80000000</color>
+    <color name="transparent_white">#B3FFFFFF</color>
+    <color name="green_rating">#2ecc71</color>
+    <color name="darker_gray">#666666</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="red_primary">#F44336</color>
 </resources>
