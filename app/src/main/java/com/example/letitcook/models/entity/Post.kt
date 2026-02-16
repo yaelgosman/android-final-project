@@ -1,6 +1,11 @@
-package com.example.letitcook.model
+package com.example.letitcook.models.entity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "posts")
 data class Post(
+    @PrimaryKey
     var id: String = "",
     val userId: String = "",
     val userName: String = "",

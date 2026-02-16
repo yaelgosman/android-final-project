@@ -1,7 +1,7 @@
 package com.example.letitcook.data
 
 import android.net.Uri
-import com.example.letitcook.model.Post
+import com.example.letitcook.models.entity.Post
 import com.example.letitcook.models.Restaurant
 import java.util.UUID
 

@@ -2,17 +2,18 @@ package com.example.letitcook.data
 
 import android.content.Context
 import android.net.Uri
-import com.example.letitcook.model.Post
+import com.example.letitcook.models.AppDatabase
+import com.example.letitcook.models.entity.Post
 import com.example.letitcook.utils.ImageUtils
 import com.example.letitcook.utils.Result
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class PostRepository(private val context: Context) {
@@ -21,93 +22,103 @@ class PostRepository(private val context: Context) {
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
-    // This is the "Folder" in Firestore where all posts are saved
+    // Initialize Room
+    private val postDao = AppDatabase.getDatabase(context).postDao()
+
     private val POSTS_COLLECTION = "posts"
 
-    // Add post
+    /**
+     * 1. GET POSTS (Observe Local DB)
+     * This returns a stream from Room. Whenever we insert into Room,
+     * this Flow automatically emits the new list to the UI.
+     */
+    fun getPostsFlow(): Flow<List<Post>> {
+        return postDao.getAllPosts()
+    }
+
+    /**
+     * 2. REFRESH (Fetch from Cloud -> Save to Local)
+     * Call this when the app starts or user swipes to refresh.
+     */
+    suspend fun refreshPosts() {
+        withContext(Dispatchers.IO) {
+            try {
+                val snapshot = db.collection(POSTS_COLLECTION)
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+
+                val posts = snapshot.documents.mapNotNull { doc ->
+                    val post = doc.toObject(Post::class.java)
+                    post?.id = doc.id
+                    post
+                }
+
+                // Save to Room (this triggers getPostsFlow automatically)
+                if (posts.isNotEmpty()) {
+                    postDao.insertAll(posts)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // If offline, we just don't update the local DB,
+                // the user still sees old data from Room.
+            }
+        }
+    }
+
+    /**
+     * 3. ADD POST
+     * Uploads to Firebase, then saves to Local DB immediately for instant UI update.
+     */
     suspend fun addPost(
         location: String,
         description: String,
         rating: Float,
         imageUri: Uri?
     ): Result {
-        return try {
-            val currentUser = auth.currentUser
-                ?: return Result(success = false, errorMessage = "User not logged in")
+        return withContext(Dispatchers.IO) {
+            try {
+                val currentUser = auth.currentUser
+                    ?: return@withContext Result(success = false, errorMessage = "User not logged in")
 
-            var downloadUrl: String? = null
+                var downloadUrl: String? = null
 
-            // Upload image (If one exists)
-            if (imageUri != null) {
-                // Generate a random filename (e.g., "post_images/random-uuid.jpg")
-                val filename = UUID.randomUUID().toString()
-                val ref = storage.reference.child("post_images/$filename.jpg")
-                val imageData = ImageUtils.prepareImageForUpload(context, imageUri)
-
-                ref.putBytes(imageData).await()
-                downloadUrl = ref.downloadUrl.await().toString()
-            }
-
-            // Create the post object
-            val post = Post(
-                userId = currentUser.uid,
-                userName = currentUser.displayName ?: "Anonymous Chef",
-                userAvatarUrl = currentUser.photoUrl?.toString(),
-                postImageUrl = downloadUrl,
-                location = location,
-                description = description,
-                rating = rating,
-                timestamp = System.currentTimeMillis()
-            )
-
-            // Save to the firestore
-            // .add() automatically generates a unique Document ID
-            db.collection(POSTS_COLLECTION).add(post).await()
-
-            Result(success = true)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result(success = false, errorMessage = e.message ?: "Failed to post")
-        }
-    }
-
-    // Get posts (for the feed)
-    suspend fun getPosts(): List<Post> {
-        return try {
-            val snapshot = db.collection(POSTS_COLLECTION)
-                .orderBy("timestamp", Query.Direction.DESCENDING) // Newest first
-                .get()
-                .await()
-
-            // Convert documents to Post objects
-            snapshot.documents.mapNotNull { doc ->
-                val post = doc.toObject(Post::class.java)
-                // Inject the Document ID into the object so we can use it later (e.g., for deleting)
-                post?.id = doc.id
-                post
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }
-
-    // TEST FUNCTION!!
-    fun getPostsRealTime(): Flow<List<Post>> = callbackFlow {
-        val subscription = db.collection(POSTS_COLLECTION)
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+                if (imageUri != null) {
+                    val filename = UUID.randomUUID().toString()
+                    val ref = storage.reference.child("post_images/$filename.jpg")
+                    val imageData = ImageUtils.prepareImageForUpload(context, imageUri)
+                    ref.putBytes(imageData).await()
+                    downloadUrl = ref.downloadUrl.await().toString()
                 }
-                val posts = snapshot?.toObjects(Post::class.java) ?: emptyList()
-                // Map the IDs like you did before
-                snapshot?.documents?.forEachIndexed { index, doc ->
-                    posts.getOrNull(index)?.id = doc.id
-                }
-                trySend(posts)
+
+                val newPost = Post(
+                    // Temporarily generate ID, Firestore will give real one later if we want strict consistency,
+                    // but for now creating a random one works for local UI
+                    id = UUID.randomUUID().toString(),
+                    userId = currentUser.uid,
+                    userName = currentUser.displayName ?: "Anonymous Chef",
+                    userAvatarUrl = currentUser.photoUrl?.toString(),
+                    postImageUrl = downloadUrl,
+                    location = location,
+                    description = description,
+                    rating = rating,
+                    timestamp = System.currentTimeMillis()
+                )
+
+                // 1. Upload to Firestore
+                val docRef = db.collection(POSTS_COLLECTION).add(newPost).await()
+
+                // 2. Update the ID to match Firestore's ID
+                val finalPost = newPost.copy(id = docRef.id)
+
+                // 3. Save to Room (UI updates instantly)
+                postDao.insert(finalPost)
+
+                Result(success = true)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result(success = false, errorMessage = e.message ?: "Failed to post")
             }
-        awaitClose { subscription.remove() }
+        }
     }
 }
