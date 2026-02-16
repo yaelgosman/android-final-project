@@ -92,6 +92,7 @@ class PostsAdapter(
         } else {
             // Hide image view if the post has no photo
 //                holder.binding.ivAvatar.visibility = View.GONE
+
         }
     }
 
