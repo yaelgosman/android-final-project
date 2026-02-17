@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="16dp">
 
+        <!-- Avatar -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivAvatar"
             android:layout_width="40dp"
@@ -47,9 +48,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="9.5 / 10"
-            android:background="@drawable/bg_red_button"
-            android:backgroundTint="@color/green_rating"
-            android:textColor="@color/white"
+            android:background="@drawable/bg_filter_active"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:textSize="12sp"
@@ -58,7 +59,7 @@
             app:layout_constraintTop_toTopOf="@id/ivAvatar"
             app:layout_constraintBottom_toBottomOf="@id/tvUserName"/>
 
-        <!-- תמונה ראשית -->
+        <!-- Main Image -->
         <ImageView
             android:id="@+id/ivPostImage"
             android:layout_width="match_parent"
@@ -68,7 +69,7 @@
             android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
 
-        <!-- icons -->
+        <!-- Like Button -->
         <ImageView
             android:id="@+id/btnLike"
             android:layout_width="24dp"
@@ -78,7 +79,18 @@
             android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ivPostImage" />
-        <!-- הערה: תחליפי ב-Drawable של לב -->
+
+        <!-- NEW: Save Button (Opposite the Like button) -->
+        <ImageView
+            android:id="@+id/btnSavePost"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_bookmark"
+            app:tint="#182A48"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivPostImage" />
 
         <TextView
             android:id="@+id/tvDescription"
