@@ -2,7 +2,7 @@ package com.example.letitcook.data
 
 import android.content.Context
 import android.net.Uri
-import com.example.letitcook.models.AppDatabase
+import com.example.letitcook.models.AppLocalDb
 import com.example.letitcook.models.entity.Post
 import com.example.letitcook.utils.ImageUtils
 import com.example.letitcook.utils.Result
@@ -23,7 +23,7 @@ class PostRepository(private val context: Context) {
     private val storage = FirebaseStorage.getInstance()
 
     // Initialize Room
-    private val postDao = AppDatabase.getDatabase(context).postDao()
+    private val postDao = AppLocalDb.database.postDao()
 
     private val POSTS_COLLECTION = "posts"
 
