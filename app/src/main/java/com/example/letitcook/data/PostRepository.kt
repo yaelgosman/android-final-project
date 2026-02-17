@@ -121,4 +121,12 @@ class PostRepository(private val context: Context) {
             }
         }
     }
+
+    suspend fun deletePost(post: Post) {
+        // 1. Delete from Room (Local)
+        postDao.delete(post)
+
+        // 2. Delete from Firestore (Cloud)
+        FirebaseFirestore.getInstance().collection("posts").document(post.id).delete()
+    }
 }

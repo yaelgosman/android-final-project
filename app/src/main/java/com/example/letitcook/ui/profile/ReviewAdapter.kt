@@ -14,7 +14,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ReviewAdapter : ListAdapter<Post, ReviewAdapter.ReviewViewHolder>(DiffCallback()) {
+enum class PostAction {
+    EDIT, DELETE
+}
+
+class ReviewAdapter(
+    private val onActionClicked: (Post, PostAction) -> Unit
+) : ListAdapter<Post, ReviewAdapter.ReviewViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
         val binding = ItemReviewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,11 +28,11 @@ class ReviewAdapter : ListAdapter<Post, ReviewAdapter.ReviewViewHolder>(DiffCall
     }
 
     override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), onActionClicked)
     }
 
     class ReviewViewHolder(private val binding: ItemReviewBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(post: Post) {
+        fun bind(post: Post, onActionClicked: (Post, PostAction) -> Unit) {
             // 1. Set Restaurant Name
             binding.tvRestaurantName.text = post.location // if (post.location.isNotEmpty()) post.location else "Unknown Place"
 
@@ -46,12 +52,33 @@ class ReviewAdapter : ListAdapter<Post, ReviewAdapter.ReviewViewHolder>(DiffCall
                     .load(post.postImageUrl)
                     .fit()
                     .centerCrop()
-                    .placeholder(R.color.darker_gray) // Make sure this color exists in colors.xml
+                    .placeholder(R.color.darker_gray)
                     .into(binding.ivReviewImage)
             } else {
                 // Collapse the image view if there is no image
                 binding.ivReviewImage.visibility = View.GONE
             }
+
+            // Handle menu click
+            binding.btnMenuOptions.setOnClickListener { view ->
+                showPopupMenu(view, post, onActionClicked)
+            }
+        }
+
+        private fun showPopupMenu(view: View, post: Post, onAction: (Post, PostAction) -> Unit) {
+            val popup = android.widget.PopupMenu(view.context, view)
+            // Inflate menu or add items programmatically
+            popup.menu.add(0, 1, 0, "Edit")
+            popup.menu.add(0, 2, 0, "Delete")
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    1 -> onAction(post, PostAction.EDIT)
+                    2 -> onAction(post, PostAction.DELETE)
+                }
+                true
+            }
+            popup.show()
         }
     }
 

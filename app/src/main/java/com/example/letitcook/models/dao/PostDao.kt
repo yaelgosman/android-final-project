@@ -1,6 +1,7 @@
 package com.example.letitcook.models.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,4 +22,7 @@ interface PostDao {
 
     @Query("DELETE FROM posts")
     suspend fun clearAll()
+
+    @Delete
+    suspend fun delete(post: Post)
 }

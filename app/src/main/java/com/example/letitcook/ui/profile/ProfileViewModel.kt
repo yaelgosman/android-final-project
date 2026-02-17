@@ -2,6 +2,7 @@ package com.example.letitcook.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.letitcook.data.PostRepository
 import com.example.letitcook.models.entity.Post
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(private val repository: PostRepository) : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -39,6 +40,12 @@ class ProfileViewModel : ViewModel() {
                         _userReviews.value = emptyList() // Handle empty state
                     }
                 }
+        }
+    }
+
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            repository.deletePost(post)
         }
     }
 }
