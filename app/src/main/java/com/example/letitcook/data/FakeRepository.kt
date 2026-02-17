@@ -1,6 +1,7 @@
 package com.example.letitcook.data
 
-import com.example.letitcook.model.Post
+import android.net.Uri
+import com.example.letitcook.models.entity.Post
 import com.example.letitcook.models.Restaurant
 import java.util.UUID
 
@@ -33,7 +34,9 @@ object FakeRepository {
         userName: String,
         location: String,
         description: String,
-        rating: Float
+        rating: Float,
+        userAvatarUrl: Uri?,
+        postImageUrl: Uri?
     ) {
         posts.add(
             0,
@@ -43,8 +46,8 @@ object FakeRepository {
                 location = location,
                 description = description,
                 rating = rating,
-                userAvatarUrl = null,
-                postImageUrl = null
+                userAvatarUrl = userAvatarUrl?.toString(),
+                postImageUrl = postImageUrl?.toString()
             )
         )
     }

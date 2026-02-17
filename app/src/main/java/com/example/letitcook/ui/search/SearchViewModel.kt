@@ -2,7 +2,7 @@ package com.example.letitcook.ui.search
 
 import androidx.lifecycle.ViewModel
 import com.example.letitcook.data.FakeRepository
-import com.example.letitcook.model.Post
+import com.example.letitcook.models.entity.Post
 
 class SearchViewModel : ViewModel() {
 

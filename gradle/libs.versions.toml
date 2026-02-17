@@ -14,6 +14,9 @@ navigationUiKtx = "2.9.7"
 navigationFragment = "2.9.7"
 navigation = "2.9.7"
 firebaseAuthKtx = "24.0.1"
+roomCommon = "2.6.1"
+roomKtx = "2.6.1"
+roomRuntime = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +36,9 @@ coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.7.3" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version = "2.51.1" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version = "2.51.1" }
+androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]

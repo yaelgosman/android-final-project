@@ -36,10 +36,8 @@ class MainActivity : AppCompatActivity() {
         val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
 
         if (authRepository.isUserLoggedIn()) {
-            // User is logged in -> start at Home page
             navGraph.setStartDestination(R.id.homeFragment)
         } else {
-            // User is NOT logged in -> Start at Login page
             navGraph.setStartDestination(R.id.loginFragment)
         }
 
