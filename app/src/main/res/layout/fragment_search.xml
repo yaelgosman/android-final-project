@@ -17,20 +17,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- שורת חיפוש -->
     <EditText
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_rounded_input"
-        android:hint="Sushi, Pasta, Tel Aviv..."
+        android:hint="Start typing (e.g. Sushi)..."
         android:paddingStart="16dp"
         android:drawableStart="@drawable/ic_search"
         android:drawablePadding="12dp"
+        android:inputType="text"
+        android:maxLines="1"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
 
-    <!-- קטגוריות (Horizontal Scroll) -->
+    <!-- Categories -->
     <HorizontalScrollView
         android:id="@+id/hsvCategories"
         android:layout_width="match_parent"
@@ -44,39 +45,49 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <!-- כפתור "All" -->
-            <Button
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCatAll"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="All"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:backgroundTint="#1A237E"
                 android:textColor="@color/white"
+                app:cornerRadius="20dp"
                 android:layout_marginEnd="8dp"/>
 
-            <!-- כפתור איטלקי - החליפי את האייקון למה שייבאת -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCatItalian"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="Italian"
-                app:icon="@drawable/ic_home"
-                app:iconTint="#E65100"
-                android:textColor="@color/black"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_marginEnd="8dp"
+                android:textColor="#1A237E"
+                app:strokeColor="#E0E0E0"
                 app:cornerRadius="20dp"
-                app:strokeColor="#E0E0E0"/>
+                android:layout_marginEnd="8dp"/>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCatAsian"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="Asian"
-                app:icon="@drawable/ic_home"
-                app:iconTint="#E91E63"
-                android:textColor="@color/black"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_marginEnd="8dp"
+                android:textColor="#1A237E"
+                app:strokeColor="#E0E0E0"
                 app:cornerRadius="20dp"
-                app:strokeColor="#E0E0E0"/>
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCatBurgers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Burgers"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:textColor="#1A237E"
+                app:strokeColor="#E0E0E0"
+                app:cornerRadius="20dp"
+                android:layout_marginEnd="8dp"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -84,20 +95,33 @@
         android:id="@+id/tvTrending"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TRENDING NOW"
+        android:text="RESULTS"
         android:textStyle="bold"
         android:textColor="#1A237E"
         android:layout_marginTop="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/hsvCategories"/>
 
-    <!-- רשימת מסעדות -->
+    <!-- The List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRestaurants"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/tvTrending"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- Loading Spinner (Hidden by default) -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminateTint="#EE4C58"
+        app:layout_constraintTop_toTopOf="@id/rvRestaurants"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
