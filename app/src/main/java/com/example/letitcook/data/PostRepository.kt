@@ -48,9 +48,31 @@ class PostRepository(private val context: Context) {
                     .get()
                     .await()
 
+
+                // 2. Get ONLY this user's saved IDs
+                val userId = auth.currentUser?.uid
+                val savedIds = if (userId != null) {
+                    val savedSnapshot = db.collection("users")
+                        .document(userId)
+                        .collection("saved_posts")
+                        .get()
+                        .await()
+
+                    // Creates a set like: {"post_id_1", "post_id_5", "post_id_9"}
+                    savedSnapshot.documents.map { it.id }.toSet()
+                } else {
+                    emptySet()
+                }
+
                 val posts = snapshot.documents.mapNotNull { doc ->
                     val post = doc.toObject(Post::class.java)
                     post?.id = doc.id
+
+                    // This line restores the "Red Bookmark" state!
+                    if (savedIds.contains(post?.id)) {
+                        post?.isSaved = true
+                    }
+
                     post
                 }
 
@@ -120,5 +142,40 @@ class PostRepository(private val context: Context) {
                 Result(success = false, errorMessage = e.message ?: "Failed to post")
             }
         }
+    }
+
+    suspend fun toggleSave(postId: String, isCurrentlySaved: Boolean) {
+        val userId = auth.currentUser?.uid ?: return
+
+        // 1. Update Local Room (Instant UI change)
+        postDao.updateSavedStatus(postId, !isCurrentlySaved)
+
+        // 2. Update Firebase Cloud (The Backup)
+        withContext(Dispatchers.IO) {
+            try {
+                val userSavedRef = db.collection("users")
+                    .document(userId)
+                    .collection("saved_posts")
+                    .document(postId)
+
+                if (!isCurrentlySaved) {
+                    // User wants to SAVE -> Create a document in Firestore
+                    // This acts as the "Link" between the user and the post
+                    val data = hashMapOf("timestamp" to System.currentTimeMillis())
+                    userSavedRef.set(data).await()
+                } else {
+                    // User wants to UNSAVE -> Delete the document
+                    userSavedRef.delete().await()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // If internet fails, it remains saved locally but might not sync.
+                // In a real app, you'd use a WorkManager to retry later.
+            }
+        }
+    }
+
+    fun getSavedPosts(): Flow<List<Post>> {
+        return postDao.getSavedPosts()
     }
 }

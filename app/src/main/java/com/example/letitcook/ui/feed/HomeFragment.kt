@@ -22,7 +22,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
         val recycler = view.findViewById<RecyclerView>(R.id.postsRecyclerView)
-        val adapter = PostsAdapter(emptyList())
+        val adapter = PostsAdapter(emptyList()) { post ->
+            viewModel.toggleSave(post)
+        }
 
         recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(requireContext())
