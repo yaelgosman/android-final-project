@@ -64,15 +64,7 @@ class RestaurantDetailsBottomSheet(
         )
 
         lifecycleScope.launch {
-            // We reuse the toggleSave logic.
-            // Since it's currently NOT saved (false), toggle will make it TRUE.
-            repository.toggleSave(post.id, false)
-
-            // Also insert the basic details into Room so it shows up in the Saved Tab
-            // (You might need to add a direct insert method to repo, or just let refreshPosts handle it later)
-            // Ideally, your repository should have a `saveYelpResult(post)` method.
-            // For simplicity, we just trigger the toggle which hits Firebase,
-            // and we rely on Room/Firebase sync.
+            repository.saveYelpPost(post)
 
             Toast.makeText(context, "Saved to your Cookbook!", Toast.LENGTH_SHORT).show()
             dismiss()

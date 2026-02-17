@@ -144,34 +144,65 @@ class PostRepository(private val context: Context) {
         }
     }
 
-    suspend fun toggleSave(postId: String, isCurrentlySaved: Boolean) {
-        val userId = auth.currentUser?.uid ?: return
+    /**
+     * 4. SAVE YELP POST (The Fix)
+     * Handles importing a new External result into Room and Firestore.
+     */
+    suspend fun saveYelpPost(post: Post) {
+        withContext(Dispatchers.IO) {
+            try {
+                // 1. Force saved state
+                post.isSaved = true
 
+                // 2. INSERT into Room (Fixes the "0 rows updated" issue)
+                postDao.insert(post)
+
+                // 3. Save Post Data to Global Firestore
+                // (Required so data survives app re-installs, as Yelp IDs aren't usually in our global feed)
+                db.collection(POSTS_COLLECTION).document(post.id).set(post)
+
+                // 4. Update User's Saved List (Reusing shared logic)
+                updateCloudSavedStatus(post.id, true)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * 5. TOGGLE SAVE
+     * For existing posts in the feed.
+     */
+    suspend fun toggleSave(postId: String, isCurrentlySaved: Boolean) {
         // 1. Update Local Room (Instant UI change)
         postDao.updateSavedStatus(postId, !isCurrentlySaved)
 
-        // 2. Update Firebase Cloud (The Backup)
+        // 2. Update Firebase Cloud (Reusing shared logic)
         withContext(Dispatchers.IO) {
             try {
-                val userSavedRef = db.collection("users")
-                    .document(userId)
-                    .collection("saved_posts")
-                    .document(postId)
-
-                if (!isCurrentlySaved) {
-                    // User wants to SAVE -> Create a document in Firestore
-                    // This acts as the "Link" between the user and the post
-                    val data = hashMapOf("timestamp" to System.currentTimeMillis())
-                    userSavedRef.set(data).await()
-                } else {
-                    // User wants to UNSAVE -> Delete the document
-                    userSavedRef.delete().await()
-                }
+                updateCloudSavedStatus(postId, !isCurrentlySaved)
             } catch (e: Exception) {
                 e.printStackTrace()
-                // If internet fails, it remains saved locally but might not sync.
-                // In a real app, you'd use a WorkManager to retry later.
             }
+        }
+    }
+
+    // --- PRIVATE HELPER (Prevents Duplication) ---
+    private suspend fun updateCloudSavedStatus(postId: String, shouldSave: Boolean) {
+        val userId = auth.currentUser?.uid ?: return
+        val userSavedRef = db.collection("users")
+            .document(userId)
+            .collection("saved_posts")
+            .document(postId)
+
+        if (shouldSave) {
+            // Create link
+            val data = hashMapOf("timestamp" to System.currentTimeMillis())
+            userSavedRef.set(data).await()
+        } else {
+            // Remove link
+            userSavedRef.delete().await()
         }
     }
 
