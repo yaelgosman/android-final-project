@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.tasks.await
 
 class PostRepository(private val context: Context) {
 
@@ -128,5 +130,44 @@ class PostRepository(private val context: Context) {
 
         // 2. Delete from Firestore (Cloud)
         FirebaseFirestore.getInstance().collection("posts").document(post.id).delete()
+    }
+
+    suspend fun updatePost(post: Post, newImageUri: Uri?): Result {
+        return try {
+            var finalImageUrl = post.postImageUrl
+
+            // If the user picked a NEW image, upload it first
+            if (newImageUri != null) {
+                val filename = UUID.randomUUID().toString()
+                val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
+
+                ref.putFile(newImageUri).await() // Upload
+                val downloadUrl = ref.downloadUrl.await() // Get URL
+                finalImageUrl = downloadUrl.toString()
+            }
+
+            val updates = mapOf(
+                "description" to post.description,
+                "location" to post.location,
+                "rating" to post.rating,
+                "postImageUrl" to (finalImageUrl ?: "")
+            )
+
+            // Update Firestore
+            FirebaseFirestore.getInstance().collection("posts")
+                .document(post.id)
+                .update(updates)
+                .await()
+
+            // Update Room
+            val updatedPostForLocalDb = post.copy(postImageUrl = finalImageUrl)
+            postDao.insert(updatedPostForLocalDb)
+
+            Result(success = true)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result(success = false, errorMessage = e.message)
+        }
     }
 }

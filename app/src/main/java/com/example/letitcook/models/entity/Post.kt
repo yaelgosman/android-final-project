@@ -1,8 +1,11 @@
 package com.example.letitcook.models.entity
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(tableName = "posts")
 data class Post(
     @PrimaryKey
@@ -15,4 +18,4 @@ data class Post(
     val description: String = "",
     val rating: Float = 0f,
     val timestamp: Long = System.currentTimeMillis()
-)
+) : Parcelable

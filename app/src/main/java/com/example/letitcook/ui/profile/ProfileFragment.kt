@@ -148,16 +148,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun performEdit(post: Post) {
-        // NAVIGATE TO YOUR "ADD/EDIT POST" FRAGMENT
-        // You likely have an existing fragment for creating posts.
-        // You should pass the 'post' object to it using SafeArgs or Bundle.
-
-        /* Example:
         val bundle = Bundle().apply {
-            putSerializable("post_to_edit", post) // Make sure Post implements Serializable or Parcelable
+            putParcelable("post", post)
         }
-        findNavController().navigate(R.id.action_profile_to_addPost, bundle)
-        */
+
+        findNavController().navigate(R.id.action_profileFragment_to_addPostFragment, bundle)
     }
 
     override fun onDestroyView() {
