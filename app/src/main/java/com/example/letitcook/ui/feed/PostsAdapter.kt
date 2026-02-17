@@ -1,5 +1,6 @@
 package com.example.letitcook.ui.feed
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +11,7 @@ import com.example.letitcook.utils.ImageUtils
 import android.view.View
 
 class PostsAdapter(
-    private val posts: List<Post>
+    private val posts: List<Post>, private val onSaveClick: (Post) -> Unit
 ) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
     private var postList: List<Post> = posts
@@ -92,7 +93,26 @@ class PostsAdapter(
         } else {
             // Hide image view if the post has no photo
 //                holder.binding.ivAvatar.visibility = View.GONE
+        }
 
+        if (post.isSaved) {
+            holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_filled)
+            holder.binding.btnSavePost.setColorFilter(Color.parseColor("#EE4C58")) // Red
+        } else {
+            holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark)
+            holder.binding.btnSavePost.setColorFilter(Color.parseColor("#182A48")) // Dark Blue
+        }
+
+        holder.binding.btnSavePost.setOnClickListener {
+            // You need to pass this click back to the Fragment/ViewModel
+            onSaveClick(post)
+
+            // Optional: Instant visual feedback before DB updates
+            if (post.isSaved) {
+                holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark)
+            } else {
+                holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_filled)
+            }
         }
     }
 
