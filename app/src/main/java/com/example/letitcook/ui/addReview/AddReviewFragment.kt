@@ -56,7 +56,7 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
             binding.autoCompleteRestaurant.setText(postToEdit.location)
             binding.etDescription.setText(postToEdit.description)
             binding.ratingBar.rating = postToEdit.rating
-            binding.btnPost.text = "Update Review"
+            binding.btnPost.text = "Update"
 
             // Load existing image if available (using Picasso)
             if (!postToEdit.postImageUrl.isNullOrEmpty()) {
@@ -71,7 +71,7 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 binding.viewClickOverlay.visibility = View.INVISIBLE // Hide "Click to add" text
             }
         } else { // If were in Create mode
-            binding.btnPost.text = "Post Review"
+            binding.btnPost.text = "Post"
         }
 
         // Fetch Restaurants from yelp
