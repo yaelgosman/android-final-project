@@ -25,4 +25,11 @@ interface PostDao {
 
     @Delete
     suspend fun delete(post: Post)
+    // Get only saved posts
+    @Query("SELECT * FROM posts WHERE isSaved = 1 ORDER BY timestamp DESC")
+    fun getSavedPosts(): Flow<List<Post>>
+
+    // Update just the saved status (Efficient)
+    @Query("UPDATE posts SET isSaved = :isSaved WHERE id = :postId")
+    suspend fun updateSavedStatus(postId: String, isSaved: Boolean)
 }

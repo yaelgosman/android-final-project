@@ -10,4 +10,11 @@
     <color name="darker_gray">#666666</color>
     <color name="light_gray">#E0E0E0</color>
     <color name="red_primary">#F44336</color>
+    <color name="cookbook_bg">#F4F9F1</color> <!-- Light Greenish background -->
+    <color name="cookbook_red">#EE4C58</color> <!-- The specific red/pink -->
+    <color name="cookbook_text_dark">#182A48</color> <!-- Dark Navy Title -->
+    <color name="cookbook_text_gray">#7A7A7A</color>
+    <color name="badge_green_bg">#DFF4E5</color>
+    <color name="badge_green_text">#3D9A50</color>
+    <color name="star_yellow">#FFC107</color>
 </resources>
