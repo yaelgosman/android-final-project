@@ -99,7 +99,7 @@ class PostsAdapter(
             holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_filled)
             holder.binding.btnSavePost.setColorFilter(Color.parseColor("#EE4C58")) // Red
         } else {
-            holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark)
+            holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_outlined)
             holder.binding.btnSavePost.setColorFilter(Color.parseColor("#182A48")) // Dark Blue
         }
 
@@ -109,7 +109,7 @@ class PostsAdapter(
 
             // Optional: Instant visual feedback before DB updates
             if (post.isSaved) {
-                holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark)
+                holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_outlined)
             } else {
                 holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_filled)
             }

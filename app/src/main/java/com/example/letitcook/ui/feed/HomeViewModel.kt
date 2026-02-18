@@ -30,7 +30,7 @@ class HomeViewModel(private val repository: PostRepository) : ViewModel() {
         viewModelScope.launch {
             // We pass the ID and the *current* state.
             // The repository will flip it (true -> false, or false -> true)
-            repository.toggleSave(post.id, post.isSaved)
+            repository.toggleSave(post)
         }
     }
 }

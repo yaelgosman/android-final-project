@@ -37,11 +37,12 @@ class RestaurantDetailsBottomSheet(
         binding.tvResName.text = restaurant.name
         binding.tvResAddress.text = restaurant.location?.displayAddress()
 
+        binding.rbResRating.rating = restaurant.rating.toFloat()
+        binding.tvResRatingNum.text = restaurant.rating.toString()
+
         if (!restaurant.imageUrl.isNullOrEmpty()) {
             Glide.with(this).load(restaurant.imageUrl).centerCrop().into(binding.ivResImage)
         }
-
-//        binding.ratingBar.rating
 
         // Logic: Save to Cookbook (Want to Go)
         binding.btnSaveToCookbook.setOnClickListener {
@@ -60,11 +61,11 @@ class RestaurantDetailsBottomSheet(
             postImageUrl = restaurant.imageUrl,
             description = "Saved from Search", // Placeholder
             rating = restaurant.rating.toFloat(),
-            isSaved = true
+            isSaved = false
         )
 
         lifecycleScope.launch {
-            repository.saveYelpPost(post)
+            repository.toggleSave(post)
 
             Toast.makeText(context, "Saved to your Cookbook!", Toast.LENGTH_SHORT).show()
             dismiss()
