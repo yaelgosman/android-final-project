@@ -17,5 +17,6 @@ data class Post(
     val location: String = "",
     val description: String = "",
     val rating: Float = 0f,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    var isSaved: Boolean = false
 ) : Parcelable
