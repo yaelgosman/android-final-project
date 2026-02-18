@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso
 import com.example.letitcook.utils.ImageUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.example.letitcook.data.PostRepository
+import com.example.letitcook.models.entity.Post
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,6 +31,8 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
 
     private val YELP_API_KEY = BuildConfig.YELP_API_KEY
     private lateinit var binding: FragmentAddReviewBinding
+
+    private var postToEdit: Post? = null // Null = Create Mode, Not Null = Edit Mode
 
     // Variable to store the selected image for later uploading
     private var selectedImageUri: Uri? = null
@@ -45,6 +48,30 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddReviewBinding.bind(view)
         val repository = PostRepository(requireContext())
+        val postToEdit: Post? = arguments?.getParcelable("post") // Checks if we are in edit mode
+
+        if (postToEdit != null) {
+            // EDIT MODE: Pre-fill the data
+            binding.autoCompleteRestaurant.setText(postToEdit.location)
+            binding.etDescription.setText(postToEdit.description)
+            binding.ratingBar.rating = postToEdit.rating
+            binding.btnPost.text = "Update"
+
+            // Load existing image if available (using Picasso)
+            if (!postToEdit.postImageUrl.isNullOrEmpty()) {
+                binding.ivSelectedImage.visibility = View.VISIBLE
+
+                com.squareup.picasso.Picasso.get()
+                    .load(postToEdit.postImageUrl)
+                    .fit().centerCrop()
+                    .into(binding.ivSelectedImage)
+
+                // Make sure the image container is visible so they see the old image
+                binding.viewClickOverlay.visibility = View.INVISIBLE // Hide "Click to add" text
+            }
+        } else { // If were in Create mode
+            binding.btnPost.text = "Post"
+        }
 
         // Fetch Restaurants from yelp
         fetchRestaurants("San Francisco")
@@ -54,6 +81,10 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         }
 
         binding.viewClickOverlay.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
+        }
+
+        binding.ivSelectedImage.setOnClickListener {
             imagePickerLauncher.launch("image/*")
         }
 
@@ -69,17 +100,30 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
 
             // Disables the button so the user doesn't click twice
             binding.btnPost.isEnabled = false
-            binding.btnPost.text = "COOKING..." // For UI reactivity
+            binding.btnPost.text = if (postToEdit != null) "UPDATING..." else "COOKING..."
 
             // Launch in Background
             lifecycleScope.launch(Dispatchers.IO) {
 
-                val result = repository.addPost(
-                    location = selectedRestaurant,
-                    description = text,
-                    rating = rating,
-                    imageUri = selectedImageUri
-                )
+                val result = if (postToEdit == null) {
+                    // Create new review
+                    repository.addPost(
+                        location = selectedRestaurant,
+                        description = text,
+                        rating = rating,
+                        imageUri = selectedImageUri
+                    )
+                } else {
+                    // Update an existing review
+                    // We copy the old post but update the fields
+                    val updatedPost = postToEdit.copy(
+                        location = selectedRestaurant,
+                        description = text,
+                        rating = rating
+                    )
+
+                    repository.updatePost(updatedPost, selectedImageUri)
+                }
 
                 withContext(Dispatchers.Main) {
                     binding.btnPost.isEnabled = true

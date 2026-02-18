@@ -23,15 +23,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Add Review"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#1A237E"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/btnCancel" />
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginHorizontal="8dp"
+            app:layout_constraintStart_toEndOf="@id/btnCancel"
+            app:layout_constraintEnd_toStartOf="@id/btnPost"
+            app:layout_constraintBaseline_toBaselineOf="@id/btnCancel" />
 
         <TextView
             android:id="@+id/btnPost"
@@ -50,7 +55,7 @@
             android:layout_height="200dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/bg_dashed_border"
-            app:layout_constraintTop_toBottomOf="@id/btnCancel">
+            app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
             <ImageView
                 android:id="@+id/iconCamera"

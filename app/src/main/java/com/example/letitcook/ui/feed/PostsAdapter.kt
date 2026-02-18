@@ -32,16 +32,6 @@ class PostsAdapter(
             tvLocation.text = post.location
             tvRating.text = "${post.rating} / 5"
             tvDescription.text = post.description
-
-//            Glide.with(root)
-//                .load(post.userAvatarUrl)
-//                .placeholder(R.drawable.ic_avatar_placeholder)
-//                .into(ivAvatar)
-//
-//            Glide.with(root)
-//                .load(post.postImageUrl)
-//                .placeholder(R.drawable.ic_post_placeholder)
-//                .into(ivPostImage)
         }
 
         // Handles the image loading
