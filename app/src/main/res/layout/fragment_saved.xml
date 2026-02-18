@@ -47,20 +47,6 @@
                 android:textStyle="bold"
                 android:layout_marginEnd="12dp"/>
 
-            <!-- Filter: Want to Go -->
-            <TextView
-                android:id="@+id/btnFilterWant"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_filter_inactive"
-                android:text="Want to Go"
-                android:textColor="@color/cookbook_text_dark"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="10dp"
-                android:textStyle="bold"
-                android:layout_marginEnd="12dp"/>
-
-            <!-- Filter: Top Rated -->
             <TextView
                 android:id="@+id/btnFilterTop"
                 android:layout_width="wrap_content"

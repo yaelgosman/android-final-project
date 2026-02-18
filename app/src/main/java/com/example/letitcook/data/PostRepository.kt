@@ -28,72 +28,65 @@ class PostRepository(private val context: Context) {
     private val postDao = AppLocalDb.database.postDao()
 
     private val POSTS_COLLECTION = "posts"
+    private val USERS_COLLECTION = "users"
+    private val SAVED_COLLECTION = "saved_posts"
 
-    /**
-     * 1. GET POSTS (Observe Local DB)
-     * This returns a stream from Room. Whenever we insert into Room,
-     * this Flow automatically emits the new list to the UI.
-     */
+    // 1. GET POSTS (Observe Local DB)
     fun getPostsFlow(): Flow<List<Post>> {
         return postDao.getAllPosts()
     }
 
-    /**
-     * 2. REFRESH (Fetch from Cloud -> Save to Local)
-     * Call this when the app starts or user swipes to refresh.
-     */
+    // 2. GET SAVED POSTS (Observe Local DB)
+    fun getSavedPosts(): Flow<List<Post>> {
+        return postDao.getSavedPosts()
+    }
+
+    // 3. REFRESH (Fetch from Cloud -> Save to Local)
     suspend fun refreshPosts() {
         withContext(Dispatchers.IO) {
             try {
+                // A. Fetch Global Posts
                 val snapshot = db.collection(POSTS_COLLECTION)
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .get()
                     .await()
 
-
-                // 2. Get ONLY this user's saved IDs
+                // B. Fetch My Saved IDs
                 val userId = auth.currentUser?.uid
                 val savedIds = if (userId != null) {
-                    val savedSnapshot = db.collection("users")
+                    val savedSnapshot = db.collection(USERS_COLLECTION)
                         .document(userId)
-                        .collection("saved_posts")
+                        .collection(SAVED_COLLECTION)
                         .get()
                         .await()
-
-                    // Creates a set like: {"post_id_1", "post_id_5", "post_id_9"}
                     savedSnapshot.documents.map { it.id }.toSet()
                 } else {
                     emptySet()
                 }
 
+                // C. Merge Logic
                 val posts = snapshot.documents.mapNotNull { doc ->
                     val post = doc.toObject(Post::class.java)
                     post?.id = doc.id
 
-                    // This line restores the "Red Bookmark" state!
-                    if (savedIds.contains(post?.id)) {
-                        post?.isSaved = true
-                    }
+                    // CRITICAL FIX: Force isSaved to be based ONLY on your personal list.
+                    // This prevents "Unsaving" issues if the global DB has 'true' by mistake.
+                    post?.isSaved = savedIds.contains(post?.id)
 
                     post
                 }
 
-                // Save to Room (this triggers getPostsFlow automatically)
+                // D. Save to Room
                 if (posts.isNotEmpty()) {
                     postDao.insertAll(posts)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                // If offline, we just don't update the local DB,
-                // the user still sees old data from Room.
             }
         }
     }
 
-    /**
-     * 3. ADD POST
-     * Uploads to Firebase, then saves to Local DB immediately for instant UI update.
-     */
+    // 4. ADD POST
     suspend fun addPost(
         location: String,
         description: String,
@@ -116,8 +109,6 @@ class PostRepository(private val context: Context) {
                 }
 
                 val newPost = Post(
-                    // Temporarily generate ID, Firestore will give real one later if we want strict consistency,
-                    // but for now creating a random one works for local UI
                     id = UUID.randomUUID().toString(),
                     userId = currentUser.uid,
                     userName = currentUser.displayName ?: "Anonymous Chef",
@@ -129,13 +120,11 @@ class PostRepository(private val context: Context) {
                     timestamp = System.currentTimeMillis()
                 )
 
-                // 1. Upload to Firestore
+                // Save to Firestore
                 val docRef = db.collection(POSTS_COLLECTION).add(newPost).await()
 
-                // 2. Update the ID to match Firestore's ID
+                // Save to Room
                 val finalPost = newPost.copy(id = docRef.id)
-
-                // 3. Save to Room (UI updates instantly)
                 postDao.insert(finalPost)
 
                 Result(success = true)
@@ -192,38 +181,45 @@ class PostRepository(private val context: Context) {
             Result(success = false, errorMessage = e.message)
         }
     }
-    suspend fun toggleSave(postId: String, isCurrentlySaved: Boolean) {
+    
+    suspend fun toggleSave(post: Post) {
         val userId = auth.currentUser?.uid ?: return
 
-        // 1. Update Local Room (Instant UI change)
-        postDao.updateSavedStatus(postId, !isCurrentlySaved)
+        // Calculate the new status (Flip it)
+        val isNowSaved = !post.isSaved
 
-        // 2. Update Firebase Cloud (The Backup)
+        // Create updated object
+        val updatedPost = post.copy(isSaved = isNowSaved)
+
+        // A. UPDATE ROOM (Local)
+        // We use INSERT (Replace).
+        // - If it's a Home post: It updates the existing row.
+        // - If it's a Yelp post: It inserts a NEW row (Importing it to your DB).
+        postDao.insert(updatedPost)
+
+        // B. UPDATE FIREBASE (Remote)
         withContext(Dispatchers.IO) {
             try {
-                val userSavedRef = db.collection("users")
+                val userSavedRef = db.collection(USERS_COLLECTION)
                     .document(userId)
-                    .collection("saved_posts")
-                    .document(postId)
+                    .collection(SAVED_COLLECTION)
+                    .document(post.id)
 
-                if (!isCurrentlySaved) {
-                    // User wants to SAVE -> Create a document in Firestore
-                    // This acts as the "Link" between the user and the post
-                    val data = hashMapOf("timestamp" to System.currentTimeMillis())
-                    userSavedRef.set(data).await()
+                if (isNowSaved) {
+                    // 1. Add link to User's collection
+                    userSavedRef.set(mapOf("timestamp" to System.currentTimeMillis()))
+
+                    // 2. Ensure Post Data exists in Global Collection
+                    // (Critical for Yelp results: we must save the restaurant name/image
+                    // so it doesn't disappear if you clear app data)
+                    db.collection(POSTS_COLLECTION).document(post.id).set(updatedPost)
                 } else {
-                    // User wants to UNSAVE -> Delete the document
-                    userSavedRef.delete().await()
+                    // 1. Remove link from User's collection
+                    userSavedRef.delete()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                // If internet fails, it remains saved locally but might not sync.
-                // In a real app, you'd use a WorkManager to retry later.
             }
         }
-    }
-
-    fun getSavedPosts(): Flow<List<Post>> {
-        return postDao.getSavedPosts()
     }
 }

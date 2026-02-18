@@ -24,7 +24,7 @@ class SavedViewModel(private val repository: PostRepository) : ViewModel() {
 
     fun toggleSave(post: Post) {
         viewModelScope.launch {
-            repository.toggleSave(post.id, post.isSaved)
+            repository.toggleSave(post)
         }
     }
 }

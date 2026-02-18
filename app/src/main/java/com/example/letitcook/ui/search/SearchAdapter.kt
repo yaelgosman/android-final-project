@@ -4,10 +4,19 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.letitcook.R
 import com.example.letitcook.databinding.ItemRestaurantBinding
-import com.example.letitcook.models.Restaurant
+import com.example.letitcook.models.YelpRestaurant
 
-class SearchAdapter(private val restaurants: List<Restaurant>) : RecyclerView.Adapter<SearchAdapter.RestaurantViewHolder>() {
+class SearchAdapter(
+    private var restaurants: List<YelpRestaurant>,
+    private val onItemClick: (YelpRestaurant) -> Unit
+) : RecyclerView.Adapter<SearchAdapter.RestaurantViewHolder>() {
+
+    fun updateList(newlist: List<YelpRestaurant>) {
+        restaurants = newlist
+        notifyDataSetChanged()
+    }
 
     class RestaurantViewHolder(val binding: ItemRestaurantBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -20,11 +29,26 @@ class SearchAdapter(private val restaurants: List<Restaurant>) : RecyclerView.Ad
         val res = restaurants[position]
         with(holder.binding) {
             tvResName.text = res.name
-            tvResDetails.text = res.type
-            tvResRating.text = res.rating
 
-            // טעינת תמונה
-            Glide.with(root.context).load(res.imageUrl).centerCrop().into(ivResImage)
+            // Get category (e.g., "Italian")
+            val type = res.categories?.firstOrNull()?.title ?: "Restaurant"
+            val city = res.location?.city ?: ""
+            tvResDetails.text = "$type • $city"
+
+            tvResRating.text = res.rating.toString()
+
+            // Load Image
+            if (!res.imageUrl.isNullOrEmpty()) {
+                Glide.with(root.context)
+                    .load(res.imageUrl)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_launcher_background) // Add a placeholder drawable if you have one
+                    .into(ivResImage)
+            }
+        }
+
+        holder.itemView.setOnClickListener {
+            onItemClick(res)
         }
     }
 

@@ -47,8 +47,7 @@ class SavedFragment : Fragment(R.layout.fragment_saved) {
 
     private fun setupFilters() {
         binding.btnFilterAll.setOnClickListener { updateFilterUI(0) }
-        binding.btnFilterWant.setOnClickListener { updateFilterUI(1) }
-        binding.btnFilterTop.setOnClickListener { updateFilterUI(2) }
+        binding.btnFilterTop.setOnClickListener { updateFilterUI(1) }
     }
 
     private fun updateFilterUI(mode: Int) {
@@ -67,13 +66,11 @@ class SavedFragment : Fragment(R.layout.fragment_saved) {
         }
 
         resetButton(binding.btnFilterAll)
-        resetButton(binding.btnFilterWant)
         resetButton(binding.btnFilterTop)
 
         // Set Active
         val activeBtn = when(mode) {
-            1 -> binding.btnFilterWant
-            2 -> binding.btnFilterTop
+            1 -> binding.btnFilterTop
             else -> binding.btnFilterAll
         }
         activeBtn.background = activeBg
@@ -84,8 +81,7 @@ class SavedFragment : Fragment(R.layout.fragment_saved) {
 
     private fun applyFilter() {
         val filteredList = when (currentFilterMode) {
-            1 -> emptyList() // "Want to Go" - logic not yet in DB, returning empty for now
-            2 -> fullPostList.filter { it.rating >= 4.5 } // Top Rated Logic
+            1 -> fullPostList.filter { it.rating >= 4.5 } // Top Rated Logic
             else -> fullPostList // All Saved
         }
         adapter.setPosts(filteredList)

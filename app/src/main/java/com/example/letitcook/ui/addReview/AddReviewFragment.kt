@@ -6,7 +6,6 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
-import com.example.letitcook.data.FakeRepository
 import com.example.letitcook.databinding.FragmentAddReviewBinding
 import android.util.Log
 import android.widget.Toast
@@ -75,7 +74,7 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         }
 
         // Fetch Restaurants from yelp
-        fetchRestaurants("New York") // for now its new york because i dont think there are and israeli location restaurants in yelp...
+        fetchRestaurants("San Francisco")
 
         binding.btnCancel.setOnClickListener {
             findNavController().popBackStack()
@@ -130,32 +129,23 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                     binding.btnPost.isEnabled = true
 
                     if (result.success) {
-                        Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT)
+                            .show()
                         findNavController().popBackStack()
                     } else {
-                        Toast.makeText(context, "Error: ${result.errorMessage}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Error: ${result.errorMessage}", Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
             }
+
         }
-    }
-
-    private fun setupSpinner() {
-        // 1. קבלת רשימת השמות מהריפו
-        val restaurantNames = FakeRepository.getRestaurantNames()
-
-        // 2. יצירת אדפטר פשוט לרשימה
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, restaurantNames)
-
-        // 3. חיבור האדפטר לשדה
-        binding.autoCompleteRestaurant.setAdapter(adapter)
     }
 
     // Fetches restaurants by location from the Yelp API
     private fun fetchRestaurants(location: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Make the Real API Call
                 val response = YelpClient.apiService.searchRestaurants(
                     authHeader = "Bearer $YELP_API_KEY",
                     searchTerm = "food",
