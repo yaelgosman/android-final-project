@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="24dp">
 
+        <!-- ... (Previous Cancel/Title/Post Buttons remain the same) ... -->
         <TextView
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
@@ -49,6 +50,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/btnCancel" />
 
+        <!-- Image Container (Same as before) -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/imageContainer"
             android:layout_width="match_parent"
@@ -108,6 +110,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageContainer"/>
 
+        <!-- RESTAURANT INPUT -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilRestaurant"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -127,6 +130,32 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <LinearLayout
+            android:id="@+id/layoutLoadingRestaurants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="@id/tilRestaurant"
+            app:layout_constraintTop_toBottomOf="@id/tilRestaurant">
+
+            <ProgressBar
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:indeterminateTint="#EE4C58" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Finding nearby places..."
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <!-- RATING -->
         <TextView
             android:id="@+id/tvLabelRating"
             android:layout_width="wrap_content"
@@ -148,6 +177,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvLabelRating"/>
 
+        <!-- VERDICT -->
         <TextView
             android:id="@+id/tvLabelVerdict"
             android:layout_width="wrap_content"

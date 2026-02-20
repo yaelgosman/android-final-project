@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs // 1. Import Safe Args
+import androidx.navigation.fragment.navArgs
 import com.example.letitcook.BuildConfig
 import com.example.letitcook.R
 import com.example.letitcook.data.PostRepository
@@ -28,7 +28,6 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
     private val YELP_API_KEY = BuildConfig.YELP_API_KEY
     private lateinit var binding: FragmentAddReviewBinding
 
-    // 2. Initialize Safe Args
     private val args: AddReviewFragmentArgs by navArgs()
 
     private var postToEdit: Post? = null
@@ -46,18 +45,16 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         binding = FragmentAddReviewBinding.bind(view)
         val repository = PostRepository(requireContext())
 
-        // 3. Get the post from Safe Args (No more manual Bundle strings)
         postToEdit = args.post
 
-        // 4. Check Mode (Edit vs Create)
         if (postToEdit != null) {
             setupEditMode(postToEdit!!)
         } else {
             binding.btnPost.text = "Post"
         }
 
-        // Fetch Restaurants (You might want to change "San Francisco" to "Tel Aviv" if testing locally)
-        fetchRestaurants("Tel Aviv")
+        // Fetch Restaurants
+        fetchRestaurants("San Francisco") // Or "San Francisco"
 
         setupListeners(repository)
     }
@@ -68,7 +65,6 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         binding.ratingBar.rating = post.rating
         binding.btnPost.text = "Update"
 
-        // Load existing image
         if (!post.postImageUrl.isNullOrEmpty()) {
             binding.iconCamera.visibility = View.GONE
             binding.tvSnapLabel.visibility = View.GONE
@@ -109,7 +105,6 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
 
             lifecycleScope.launch(Dispatchers.IO) {
                 val result = if (postToEdit == null) {
-                    // --- CREATE NEW ---
                     repository.addPost(
                         location = selectedRestaurant,
                         description = text,
@@ -117,15 +112,11 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                         imageUri = selectedImageUri
                     )
                 } else {
-                    // --- UPDATE EXISTING ---
-                    // Create a copy with the new values
                     val updatedPost = postToEdit!!.copy(
                         location = selectedRestaurant,
                         description = text,
                         rating = rating
-                        // Note: We don't change the ID or UserID
                     )
-                    // Pass the new URI (if the user selected a new photo)
                     repository.updatePost(updatedPost, selectedImageUri)
                 }
 
@@ -143,28 +134,50 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
     }
 
     private fun fetchRestaurants(location: String) {
+        // 1. Show the Loading Indicator below the field
+        binding.layoutLoadingRestaurants.visibility = View.VISIBLE
+
+        // 2. Optional: Set a temporary "Loading..." item in the list itself
+        // This ensures if they click the dropdown immediately, it's not empty
+        val loadingAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, listOf("Loading..."))
+        binding.autoCompleteRestaurant.setAdapter(loadingAdapter)
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                Log.d("YELP", "Fetching restaurants for: $location")
+
                 val response = YelpClient.apiService.searchRestaurants(
                     authHeader = "Bearer $YELP_API_KEY",
                     searchTerm = "food",
                     location = location
                 )
+
                 val restaurantNames = response.restaurants.map { it.name }
+                Log.d("YELP", "Found ${restaurantNames.size} restaurants")
 
                 withContext(Dispatchers.Main) {
+                    // 3. Hide Loading Indicator
+                    binding.layoutLoadingRestaurants.visibility = View.GONE
+
                     if (context != null) {
+                        // 4. Set the REAL data
                         val adapter = ArrayAdapter(
                             requireContext(),
                             android.R.layout.simple_dropdown_item_1line,
                             restaurantNames
                         )
                         binding.autoCompleteRestaurant.setAdapter(adapter)
+
+                        // Optional: Open the list automatically if you want
+                        // binding.autoCompleteRestaurant.showDropDown()
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.e("YELP", "Error fetching restaurants: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    binding.layoutLoadingRestaurants.visibility = View.GONE
+                }
             }
         }
     }
