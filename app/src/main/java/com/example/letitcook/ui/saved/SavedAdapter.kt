@@ -33,9 +33,6 @@ class SavedAdapter(
             tvSubtitle.text = post.location
             tvRating.text = post.rating.toString()
 
-            // Logic for "Open Now" vs Time.
-            // Since we don't have hours in DB, we'll fake it based on Rating for demo or static
-            tvStatusBadge.text = "Open Now"
 
             if (!post.postImageUrl.isNullOrEmpty()) {
                 Glide.with(root.context)

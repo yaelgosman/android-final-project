@@ -1,40 +1,37 @@
 package com.example.letitcook.ui.addReview
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
-import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.example.letitcook.R
-import com.example.letitcook.databinding.FragmentAddReviewBinding
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs // 1. Import Safe Args
 import com.example.letitcook.BuildConfig
+import com.example.letitcook.R
+import com.example.letitcook.data.PostRepository
+import com.example.letitcook.databinding.FragmentAddReviewBinding
+import com.example.letitcook.models.entity.Post
 import com.example.letitcook.network.YelpClient
+import com.example.letitcook.utils.ImageUtils
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
-import com.squareup.picasso.Picasso
-import com.example.letitcook.utils.ImageUtils
-import com.google.firebase.auth.FirebaseAuth
-import com.example.letitcook.data.PostRepository
-import com.example.letitcook.models.entity.Post
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 
 class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
 
     private val YELP_API_KEY = BuildConfig.YELP_API_KEY
     private lateinit var binding: FragmentAddReviewBinding
 
-    private var postToEdit: Post? = null // Null = Create Mode, Not Null = Edit Mode
+    // 2. Initialize Safe Args
+    private val args: AddReviewFragmentArgs by navArgs()
 
-    // Variable to store the selected image for later uploading
+    private var postToEdit: Post? = null
     private var selectedImageUri: Uri? = null
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -48,34 +45,43 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddReviewBinding.bind(view)
         val repository = PostRepository(requireContext())
-        val postToEdit: Post? = arguments?.getParcelable("post") // Checks if we are in edit mode
 
+        // 3. Get the post from Safe Args (No more manual Bundle strings)
+        postToEdit = args.post
+
+        // 4. Check Mode (Edit vs Create)
         if (postToEdit != null) {
-            // EDIT MODE: Pre-fill the data
-            binding.autoCompleteRestaurant.setText(postToEdit.location)
-            binding.etDescription.setText(postToEdit.description)
-            binding.ratingBar.rating = postToEdit.rating
-            binding.btnPost.text = "Update"
-
-            // Load existing image if available (using Picasso)
-            if (!postToEdit.postImageUrl.isNullOrEmpty()) {
-                binding.ivSelectedImage.visibility = View.VISIBLE
-
-                com.squareup.picasso.Picasso.get()
-                    .load(postToEdit.postImageUrl)
-                    .fit().centerCrop()
-                    .into(binding.ivSelectedImage)
-
-                // Make sure the image container is visible so they see the old image
-                binding.viewClickOverlay.visibility = View.INVISIBLE // Hide "Click to add" text
-            }
-        } else { // If were in Create mode
+            setupEditMode(postToEdit!!)
+        } else {
             binding.btnPost.text = "Post"
         }
 
-        // Fetch Restaurants from yelp
-        fetchRestaurants("San Francisco")
+        // Fetch Restaurants (You might want to change "San Francisco" to "Tel Aviv" if testing locally)
+        fetchRestaurants("Tel Aviv")
 
+        setupListeners(repository)
+    }
+
+    private fun setupEditMode(post: Post) {
+        binding.autoCompleteRestaurant.setText(post.location)
+        binding.etDescription.setText(post.description)
+        binding.ratingBar.rating = post.rating
+        binding.btnPost.text = "Update"
+
+        // Load existing image
+        if (!post.postImageUrl.isNullOrEmpty()) {
+            binding.iconCamera.visibility = View.GONE
+            binding.tvSnapLabel.visibility = View.GONE
+            binding.ivSelectedImage.visibility = View.VISIBLE
+
+            Picasso.get()
+                .load(post.postImageUrl)
+                .fit().centerCrop()
+                .into(binding.ivSelectedImage)
+        }
+    }
+
+    private fun setupListeners(repository: PostRepository) {
         binding.btnCancel.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -98,15 +104,12 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 return@setOnClickListener
             }
 
-            // Disables the button so the user doesn't click twice
             binding.btnPost.isEnabled = false
             binding.btnPost.text = if (postToEdit != null) "UPDATING..." else "COOKING..."
 
-            // Launch in Background
             lifecycleScope.launch(Dispatchers.IO) {
-
                 val result = if (postToEdit == null) {
-                    // Create new review
+                    // --- CREATE NEW ---
                     repository.addPost(
                         location = selectedRestaurant,
                         description = text,
@@ -114,35 +117,31 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                         imageUri = selectedImageUri
                     )
                 } else {
-                    // Update an existing review
-                    // We copy the old post but update the fields
-                    val updatedPost = postToEdit.copy(
+                    // --- UPDATE EXISTING ---
+                    // Create a copy with the new values
+                    val updatedPost = postToEdit!!.copy(
                         location = selectedRestaurant,
                         description = text,
                         rating = rating
+                        // Note: We don't change the ID or UserID
                     )
-
+                    // Pass the new URI (if the user selected a new photo)
                     repository.updatePost(updatedPost, selectedImageUri)
                 }
 
                 withContext(Dispatchers.Main) {
                     binding.btnPost.isEnabled = true
-
                     if (result.success) {
-                        Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT).show()
                         findNavController().popBackStack()
                     } else {
-                        Toast.makeText(context, "Error: ${result.errorMessage}", Toast.LENGTH_LONG)
-                            .show()
+                        Toast.makeText(context, "Error: ${result.errorMessage}", Toast.LENGTH_LONG).show()
                     }
                 }
             }
-
         }
     }
 
-    // Fetches restaurants by location from the Yelp API
     private fun fetchRestaurants(location: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -151,13 +150,10 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                     searchTerm = "food",
                     location = location
                 )
-
-                // Extract the restaurant names
                 val restaurantNames = response.restaurants.map { it.name }
 
-                // Updates the UI
                 withContext(Dispatchers.Main) {
-                    if (context != null) { // Check context to avoid crashes if user left screen
+                    if (context != null) {
                         val adapter = ArrayAdapter(
                             requireContext(),
                             android.R.layout.simple_dropdown_item_1line,
@@ -173,23 +169,11 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         }
     }
 
-    // Helper Function to update the UI state
     private fun updateImageUI(uri: Uri) {
-        // Hide the placeholder icon and text of the image input
         binding.iconCamera.visibility = View.GONE
         binding.tvSnapLabel.visibility = View.GONE
-
-        // Show the ImageView
         binding.ivSelectedImage.visibility = View.VISIBLE
-
-        // Load the image
         val rotation = ImageUtils.getRotationAngle(requireContext(), uri)
-
-        Picasso.get()
-            .load(uri)
-            .rotate(rotation)
-            .fit()
-            .centerCrop()
-            .into(binding.ivSelectedImage)
+        Picasso.get().load(uri).rotate(rotation).fit().centerCrop().into(binding.ivSelectedImage)
     }
 }
