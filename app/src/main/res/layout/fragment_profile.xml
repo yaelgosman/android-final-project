@@ -13,11 +13,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="24dp">
 
-        <!--
-             WHITE HEADER CONTAINER
-             Contains Profile Pic, Name, Stats, etc.
-             Added elevation for shadow effect.
-        -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/profileHeaderContainer"
             android:layout_width="match_parent"

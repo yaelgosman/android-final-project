@@ -7,8 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.letitcook.R
-import com.example.letitcook.LetItCookApp
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 import com.example.letitcook.databinding.FragmentSavedBinding
 import com.example.letitcook.models.entity.Post
 

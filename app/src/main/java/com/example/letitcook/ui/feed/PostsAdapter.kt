@@ -55,12 +55,8 @@ class PostsAdapter(
                 .placeholder(R.drawable.bg_dashed_border) // Show placeholder while loading
                 .into(holder.binding.ivPostImage)
 
-        } else {
-                // Hide image view if the post has no photo
-//                holder.binding.ivPostImage.visibility = View.GONE
         }
 
-        // Handles the user pfp
         if (!post.userAvatarUrl.isNullOrEmpty()) {
             holder.binding.ivAvatar.visibility = View.VISIBLE
 
@@ -80,9 +76,6 @@ class PostsAdapter(
                 .centerCrop()
                 .into(holder.binding.ivAvatar)
 
-        } else {
-            // Hide image view if the post has no photo
-//                holder.binding.ivAvatar.visibility = View.GONE
         }
 
         if (post.isSaved) {
@@ -94,10 +87,8 @@ class PostsAdapter(
         }
 
         holder.binding.btnSavePost.setOnClickListener {
-            // You need to pass this click back to the Fragment/ViewModel
             onSaveClick(post)
 
-            // Optional: Instant visual feedback before DB updates
             if (post.isSaved) {
                 holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_outlined)
             } else {

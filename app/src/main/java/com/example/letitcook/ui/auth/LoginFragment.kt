@@ -9,26 +9,14 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.repositories.AuthRepository
 import com.example.letitcook.databinding.FragmentLoginBinding
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-//    private val authViewModel: AuthViewModel by viewModels()
     private lateinit var authViewModel: AuthViewModel
 
     override fun onCreateView(
@@ -71,11 +59,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Checks if the login was successful
+        // if login was successful
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
 
-            // Hides the progress bar and re-enable the button as soon as we get a result
-            // whether its a success and navigates to the nome page. or a failure and lets the user to enter different credentials
             binding.progressBar.visibility = View.GONE
             binding.btnLogin.isEnabled = true
             binding.btnLogin.alpha = 1.0f
@@ -88,12 +74,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (result.success) {
                 try {
 
-                    // this part inside the navigation Removes the login page from the page stack - to prevent the user from returning to it after successful login.
                     findNavController().navigate(
                         R.id.action_login_to_home,
                         null,
                         androidx.navigation.NavOptions.Builder()
-                            .setPopUpTo(R.id.loginFragment, true) // Remove loginFragment from history
+                            .setPopUpTo(R.id.loginFragment, true)
                             .build()
                     )
                 } catch (e: Exception) {

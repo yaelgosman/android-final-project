@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.repositories.AuthRepository
 import com.example.letitcook.utils.Result
 import kotlinx.coroutines.launch
 

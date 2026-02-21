@@ -37,7 +37,7 @@ class SearchViewModel : ViewModel() {
 
     // Typing Search (with Debounce)
     fun onSearchQueryChanged(query: String) {
-        // 1. Cancel previous job if user is still typing
+        // Cancel previous job if user is still typing
         searchJob?.cancel()
 
         if (query.isBlank()) {
@@ -45,9 +45,9 @@ class SearchViewModel : ViewModel() {
             return
         }
 
-        // 2. Start new job
+        // Start new job
         searchJob = viewModelScope.launch {
-            // 3. Wait 500ms to see if user types more
+            // Wait 500ms to see if user types more
             delay(500)
 
             if (query.isNotEmpty()) {

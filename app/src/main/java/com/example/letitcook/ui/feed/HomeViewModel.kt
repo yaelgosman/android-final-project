@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 import com.example.letitcook.models.entity.Post
 import kotlinx.coroutines.launch
 

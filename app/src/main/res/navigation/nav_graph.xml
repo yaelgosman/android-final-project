@@ -9,7 +9,6 @@
         android:id="@+id/action_global_addReviewFragment"
         app:destination="@id/addReviewFragment" />
 
-    <!-- Auth Screens -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.letitcook.ui.auth.LoginFragment"
@@ -20,7 +19,6 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
-        <!-- prevents the user to go back to the login page when the user is logged in -->
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
@@ -41,7 +39,6 @@
             app:destination="@id/loginFragment" />
     </fragment>
 
-    <!-- Main Screens (Bottom Nav) -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.letitcook.ui.feed.HomeFragment"
@@ -51,10 +48,6 @@
         android:id="@+id/searchFragment"
         android:name="com.example.letitcook.ui.search.SearchFragment"
         android:label="Search">
-        <!-- מאפשר מעבר לפרטי מסעדה -->
-<!--        <action-->
-<!--            android:id="@+id/action_search_to_details"-->
-<!--            app:destination="@id/restaurantDetailsFragment" />-->
     </fragment>
 
 
@@ -88,7 +81,6 @@
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
 
-    <!-- Add Review Screen (נפתח מהכפתור האדום) -->
     <fragment
         android:id="@+id/addReviewFragment"
         android:name="com.example.letitcook.ui.addReview.AddReviewFragment"
@@ -100,11 +92,4 @@
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
-
-    <!-- Placeholder for Details if needed -->
-<!--    <fragment-->
-<!--        android:id="@+id/restaurantDetailsFragment"-->
-<!--        android:name="com.example.letitcook.ui.details.RestaurantDetailsFragment"-->
-<!--        android:label="Details" />-->
-
 </navigation>
