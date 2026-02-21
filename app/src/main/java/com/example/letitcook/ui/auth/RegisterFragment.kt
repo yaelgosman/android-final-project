@@ -84,6 +84,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 binding.btnRegister.isEnabled = false
                 binding.btnRegister.alpha = 0.5f
 
+                // Disable text inputs and image upload buttons when loader is active
+                binding.etFullName.isEnabled = false
+                binding.etEmail.isEnabled = false
+                binding.etPassword.isEnabled = false
+                binding.btnUploadImage.isEnabled = false
+                binding.ivProfilePreview.isEnabled = false
+                binding.tvLogin.isEnabled = false
+
                 // Calls the register function in your ViewModel
                 authViewModel.register(email, password, name, profileImageUri)
             }
@@ -101,6 +109,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             binding.progressBar.visibility = View.GONE
             binding.btnRegister.isEnabled = true
             binding.btnRegister.alpha = 1.0f
+
+            // Re-enable text inputs and image upload buttons after loader finish
+            binding.etFullName.isEnabled = true
+            binding.etEmail.isEnabled = true
+            binding.etPassword.isEnabled = true
+            binding.btnUploadImage.isEnabled = true
+            binding.ivProfilePreview.isEnabled = true
+            binding.tvLogin.isEnabled = true
 
             if (result.success) {
                 Toast.makeText(requireContext(), "Registration successful!", Toast.LENGTH_SHORT).show()

@@ -52,6 +52,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 binding.btnLogin.isEnabled = false
                 binding.btnLogin.alpha = 0.5f
 
+                // Disable the input fields when loader is active
+                binding.etEmail.isEnabled = false
+                binding.etPassword.isEnabled = false
+                binding.tvSignUp.isEnabled = false
+
                 authViewModel.login(email, password)
             }
         }
@@ -74,6 +79,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             binding.progressBar.visibility = View.GONE
             binding.btnLogin.isEnabled = true
             binding.btnLogin.alpha = 1.0f
+
+            // Re-enable input fields after loader finish
+            binding.etEmail.isEnabled = true
+            binding.etPassword.isEnabled = true
+            binding.tvSignUp.isEnabled = true
 
             if (result.success) {
                 try {
