@@ -79,6 +79,11 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             if (name.isBlank() || email.isBlank() || password.isBlank()) {
                 Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
             } else {
+                // Shows progress bar and disable button - so the user wont be able to spam click it
+                binding.progressBar.visibility = View.VISIBLE
+                binding.btnRegister.isEnabled = false
+                binding.btnRegister.alpha = 0.5f
+
                 // Calls the register function in your ViewModel
                 authViewModel.register(email, password, name, profileImageUri)
             }
@@ -91,6 +96,12 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
         // Observe the registration result
         authViewModel.registrationResult.observe(viewLifecycleOwner) { result ->
+
+            // Hide progress bar and re-enable button - whether navigates to the login page on successful register, or let the user fix their input.
+            binding.progressBar.visibility = View.GONE
+            binding.btnRegister.isEnabled = true
+            binding.btnRegister.alpha = 1.0f
+
             if (result.success) {
                 Toast.makeText(requireContext(), "Registration successful!", Toast.LENGTH_SHORT).show()
                 // Navigate to Login or Home after successful registration
