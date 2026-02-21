@@ -9,7 +9,17 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/login_background"
-         />
+    />
+
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_letitcook_logo"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -19,10 +29,10 @@
         android:textColor="@color/white"
         android:textSize="48sp"
         android:textStyle="bold"
-        android:layout_marginTop="100dp"
-        android:layout_marginStart="32dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toEndOf="@id/ivLogo"
+        app:layout_constraintTop_toTopOf="@id/ivLogo"
+        app:layout_constraintBottom_toBottomOf="@id/ivLogo"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +40,8 @@
         android:text="Don't gatekeep the flavor."
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@id/tvTitle"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/ivLogo"
         app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
     <androidx.cardview.widget.CardView
