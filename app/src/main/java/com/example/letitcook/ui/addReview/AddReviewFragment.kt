@@ -100,6 +100,14 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 return@setOnClickListener
             }
 
+            // Show spinner and disables ALL UI inputs
+            binding.progressBarMain.visibility = View.VISIBLE
+            binding.btnCancel.isEnabled = false
+            binding.autoCompleteRestaurant.isEnabled = false
+            binding.etDescription.isEnabled = false
+            binding.viewClickOverlay.isEnabled = false // disables image upload
+            binding.ratingBar.setIsIndicator(true)     // disables rating bar
+
             binding.btnPost.isEnabled = false
             binding.btnPost.text = if (postToEdit != null) "UPDATING..." else "COOKING..."
 
@@ -121,6 +129,15 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 }
 
                 withContext(Dispatchers.Main) {
+
+                    // Hides spinner and enable UI inputs
+                    binding.progressBarMain.visibility = View.GONE
+                    binding.btnCancel.isEnabled = true
+                    binding.autoCompleteRestaurant.isEnabled = true
+                    binding.etDescription.isEnabled = true
+                    binding.viewClickOverlay.isEnabled = true
+                    binding.ratingBar.setIsIndicator(false)
+
                     binding.btnPost.isEnabled = true
                     if (result.success) {
                         Toast.makeText(context, "Review posted successfully!", Toast.LENGTH_SHORT).show()
