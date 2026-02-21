@@ -7,14 +7,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.letitcook.R
 import com.example.letitcook.data.PostRepository
 import com.example.letitcook.databinding.BottomSheetRestaurantBinding
 import com.example.letitcook.models.YelpRestaurant
 import com.example.letitcook.models.entity.Post
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class RestaurantDetailsBottomSheet(
     private val restaurant: YelpRestaurant
@@ -44,7 +42,6 @@ class RestaurantDetailsBottomSheet(
             Glide.with(this).load(restaurant.imageUrl).centerCrop().into(binding.ivResImage)
         }
 
-        // Logic: Save to Cookbook (Want to Go)
         binding.btnSaveToCookbook.setOnClickListener {
             saveToCookbook()
         }

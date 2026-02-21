@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.letitcook.R
 import com.example.letitcook.databinding.ItemSavedPostBinding
 import com.example.letitcook.models.entity.Post
 

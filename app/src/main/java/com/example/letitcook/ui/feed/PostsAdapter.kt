@@ -97,7 +97,7 @@ class PostsAdapter(
             // You need to pass this click back to the Fragment/ViewModel
             onSaveClick(post)
 
-            // Optional: Instant visual feedback before DB updates
+            // Instant visual feedback before DB updates
             if (post.isSaved) {
                 holder.binding.btnSavePost.setImageResource(R.drawable.ic_bookmark_outlined)
             } else {

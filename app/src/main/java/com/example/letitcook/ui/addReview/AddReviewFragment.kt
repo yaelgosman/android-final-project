@@ -54,7 +54,7 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
         }
 
         // Fetch Restaurants
-        fetchRestaurants("San Francisco") // Or "San Francisco"
+        fetchRestaurants("San Francisco")
 
         setupListeners(repository)
     }
@@ -151,10 +151,10 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
     }
 
     private fun fetchRestaurants(location: String) {
-        // 1. Show the Loading Indicator below the field
+        // Show the Loading Indicator below the field
         binding.layoutLoadingRestaurants.visibility = View.VISIBLE
 
-        // 2. Optional: Set a temporary "Loading..." item in the list itself
+        // Set a temporary "Loading..." item in the list itself
         // This ensures if they click the dropdown immediately, it's not empty
         val loadingAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, listOf("Loading..."))
         binding.autoCompleteRestaurant.setAdapter(loadingAdapter)
@@ -173,20 +173,17 @@ class AddReviewFragment : Fragment(R.layout.fragment_add_review) {
                 Log.d("YELP", "Found ${restaurantNames.size} restaurants")
 
                 withContext(Dispatchers.Main) {
-                    // 3. Hide Loading Indicator
+                    // Hide Loading Indicator
                     binding.layoutLoadingRestaurants.visibility = View.GONE
 
                     if (context != null) {
-                        // 4. Set the REAL data
+                        // Set the REAL data
                         val adapter = ArrayAdapter(
                             requireContext(),
                             android.R.layout.simple_dropdown_item_1line,
                             restaurantNames
                         )
                         binding.autoCompleteRestaurant.setAdapter(adapter)
-
-                        // Optional: Open the list automatically if you want
-                        // binding.autoCompleteRestaurant.showDropDown()
                     }
                 }
             } catch (e: Exception) {

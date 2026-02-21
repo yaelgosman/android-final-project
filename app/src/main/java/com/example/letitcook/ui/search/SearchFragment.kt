@@ -1,17 +1,14 @@
 package com.example.letitcook.ui.search
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.letitcook.R
 import com.example.letitcook.databinding.FragmentSearchBinding
-import com.google.android.material.button.MaterialButton
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
@@ -55,7 +52,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun setupCategories() {
-        // 1. Define the list of all category buttons
+        // Define the list of all category buttons
         val buttons = listOf(
             binding.btnCatAll,
             binding.btnCatItalian,
@@ -63,7 +60,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             binding.btnCatBurgers
         )
 
-        // 2. Define colors
+        // Define colors
         val activeBgColor = android.graphics.Color.parseColor("#1A237E") // Dark Blue
         val activeTextColor = android.graphics.Color.WHITE
 
@@ -71,27 +68,23 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         val inactiveTextColor = android.graphics.Color.parseColor("#1A237E") // Dark Blue
         val inactiveStrokeColor = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#E0E0E0")) // Light Gray
 
-        // 3. Helper function to update visuals
+        // Helper function to update visuals
         fun updateButtonVisuals(clickedBtn: com.google.android.material.button.MaterialButton) {
             buttons.forEach { btn ->
                 if (btn.id == clickedBtn.id) {
-                    // === ACTIVE STATE ===
-                    // Make it filled Blue
                     btn.setBackgroundColor(activeBgColor)
                     btn.setTextColor(activeTextColor)
-                    btn.strokeWidth = 0 // Remove outline
+                    btn.strokeWidth = 0
                 } else {
-                    // === INACTIVE STATE ===
-                    // Make it Transparent with Outline
                     btn.setBackgroundColor(inactiveBgColor)
                     btn.setTextColor(inactiveTextColor)
                     btn.strokeColor = inactiveStrokeColor
-                    btn.strokeWidth = 3 // Thickness of the outline (approx 1dp)
+                    btn.strokeWidth = 3
                 }
             }
         }
 
-        // 4. Click Logic
+        // Click Logic
         val onCategoryClick = { btn: com.google.android.material.button.MaterialButton, query: String ->
             // Update the UI immediately
             updateButtonVisuals(btn)
@@ -102,7 +95,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             viewModel.searchCategory(query)
         }
 
-        // 5. Attach Listeners
+        // Attach Listeners
         binding.btnCatAll.setOnClickListener { onCategoryClick(binding.btnCatAll, "") }
         binding.btnCatItalian.setOnClickListener { onCategoryClick(binding.btnCatItalian, "Italian") }
         binding.btnCatAsian.setOnClickListener { onCategoryClick(binding.btnCatAsian, "Asian") }

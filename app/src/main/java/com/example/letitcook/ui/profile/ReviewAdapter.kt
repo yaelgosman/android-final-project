@@ -33,19 +33,19 @@ class ReviewAdapter(
 
     class ReviewViewHolder(private val binding: ItemReviewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post, onActionClicked: (Post, PostAction) -> Unit) {
-            // 1. Set Restaurant Name
+            // Set Restaurant Name
             binding.tvRestaurantName.text = post.location // if (post.location.isNotEmpty()) post.location else "Unknown Place"
 
-            // 2. Set Content & Rating
+            // Set Content & Rating
             binding.tvReviewContent.text = post.description
             binding.rbReviewRating.rating = post.rating
 
-            // 3. Set Date
+            // Set Date
             val date = Date(post.timestamp)
             val format = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
             binding.tvReviewDate.text = format.format(date)
 
-            // 4. Load Image (Only if URL exists)
+            // Load Image (Only if URL exists)
             if (!post.postImageUrl.isNullOrEmpty()) {
                 binding.ivReviewImage.visibility = View.VISIBLE
                 Picasso.get()

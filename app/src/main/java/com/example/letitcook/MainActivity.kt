@@ -7,10 +7,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.letitcook.databinding.ActivityMainBinding
-import com.example.letitcook.R
 import com.example.letitcook.data.AuthRepository
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 
 class MainActivity : AppCompatActivity() {
 

@@ -7,7 +7,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.letitcook.data.PostRepository
 import com.example.letitcook.models.entity.Post
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SavedViewModel(private val repository: PostRepository) : ViewModel() {

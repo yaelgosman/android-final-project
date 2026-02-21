@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.tasks.await
 
 class PostRepository(private val context: Context) {
 
@@ -31,27 +29,27 @@ class PostRepository(private val context: Context) {
     private val USERS_COLLECTION = "users"
     private val SAVED_COLLECTION = "saved_posts"
 
-    // 1. GET POSTS (Observe Local DB)
+    // GET POSTS (Observe Local DB)
     fun getPostsFlow(): Flow<List<Post>> {
         return postDao.getAllPosts()
     }
 
-    // 2. GET SAVED POSTS (Observe Local DB)
+    // GET SAVED POSTS (Observe Local DB)
     fun getSavedPosts(): Flow<List<Post>> {
         return postDao.getSavedPosts()
     }
 
-    // 3. REFRESH (Fetch from Cloud -> Save to Local)
+    // REFRESH (Fetch from Cloud -> Save to Local)
     suspend fun refreshPosts() {
         withContext(Dispatchers.IO) {
             try {
-                // A. Fetch Global Posts
+                // Fetch Global Posts
                 val snapshot = db.collection(POSTS_COLLECTION)
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .get()
                     .await()
 
-                // B. Fetch My Saved IDs
+                // Fetch My Saved IDs
                 val userId = auth.currentUser?.uid
                 val savedIds = if (userId != null) {
                     val savedSnapshot = db.collection(USERS_COLLECTION)
@@ -64,19 +62,19 @@ class PostRepository(private val context: Context) {
                     emptySet()
                 }
 
-                // C. Merge Logic
+                // Merge Logic
                 val posts = snapshot.documents.mapNotNull { doc ->
                     val post = doc.toObject(Post::class.java)
                     post?.id = doc.id
 
-                    // CRITICAL FIX: Force isSaved to be based ONLY on your personal list.
+                    // Force isSaved to be based ONLY on the user's personal list.
                     // This prevents "Unsaving" issues if the global DB has 'true' by mistake.
                     post?.isSaved = savedIds.contains(post?.id)
 
                     post
                 }
 
-                // D. Save to Room
+                // Save to Room
                 if (posts.isNotEmpty()) {
                     postDao.insertAll(posts)
                 }
@@ -86,7 +84,7 @@ class PostRepository(private val context: Context) {
         }
     }
 
-    // 4. ADD POST
+    // ADD POST
     suspend fun addPost(
         location: String,
         description: String,
@@ -136,10 +134,10 @@ class PostRepository(private val context: Context) {
     }
 
     suspend fun deletePost(post: Post) {
-        // 1. Delete from Room (Local)
+        // Delete from Room (Local)
         postDao.delete(post)
 
-        // 2. Delete from Firestore (Cloud)
+        // Delete from Firestore (Cloud)
         FirebaseFirestore.getInstance().collection("posts").document(post.id).delete()
     }
 
@@ -191,13 +189,13 @@ class PostRepository(private val context: Context) {
         // Create updated object
         val updatedPost = post.copy(isSaved = isNowSaved)
 
-        // A. UPDATE ROOM (Local)
+        // UPDATE ROOM (Local)
         // We use INSERT (Replace).
         // - If it's a Home post: It updates the existing row.
         // - If it's a Yelp post: It inserts a NEW row (Importing it to your DB).
         postDao.insert(updatedPost)
 
-        // B. UPDATE FIREBASE (Remote)
+        // UPDATE FIREBASE (Remote)
         withContext(Dispatchers.IO) {
             try {
                 val userSavedRef = db.collection(USERS_COLLECTION)
@@ -206,15 +204,12 @@ class PostRepository(private val context: Context) {
                     .document(post.id)
 
                 if (isNowSaved) {
-                    // 1. Add link to User's collection
+                    // Add link to User's collection
                     userSavedRef.set(mapOf("timestamp" to System.currentTimeMillis()))
 
-                    // 2. Ensure Post Data exists in Global Collection
-                    // (Critical for Yelp results: we must save the restaurant name/image
-                    // so it doesn't disappear if you clear app data)
                     db.collection(POSTS_COLLECTION).document(post.id).set(updatedPost)
                 } else {
-                    // 1. Remove link from User's collection
+                    // Remove link from User's collection
                     userSavedRef.delete()
                 }
             } catch (e: Exception) {

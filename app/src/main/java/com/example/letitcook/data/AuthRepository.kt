@@ -33,8 +33,7 @@ class AuthRepository(private val context: Context) {
             e.printStackTrace()
 
             val errorMessage = ErrorParser.parseHttpError(e)
-//            Result(success = false, errorMessage = errorMessage) // highlighted to debug error
-            Result(success = false, errorMessage = e.message ?: "Unknown login error")
+            Result(success = false, errorMessage = errorMessage)
         }
     }
 
