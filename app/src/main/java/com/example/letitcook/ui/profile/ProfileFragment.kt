@@ -13,8 +13,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.AuthRepository
+import com.example.letitcook.repositories.PostRepository
 import com.example.letitcook.databinding.FragmentProfileBinding
 import com.example.letitcook.models.entity.Post
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -55,10 +55,9 @@ class ProfileFragment : Fragment() {
 
         if (user != null) {
             // Set the user's name
-            binding.tvProfileName.text = user.displayName?.uppercase() ?: "No Name" //check if maybe just insert their email instead?
+            binding.tvProfileName.text = user.displayName?.uppercase() ?: "No Name"
             binding.tvHeaderName.text = user.displayName ?: "User"
 
-            // Set the pfp
             if (user.photoUrl != null) {
                 Picasso.get().load(user.photoUrl)
                     .fit().centerCrop()
@@ -72,7 +71,6 @@ class ProfileFragment : Fragment() {
             viewModel.loadUserReviews(user.uid)
         }
 
-        // Setup the Settings (Gear) Icon
         binding.ivSettings.setOnClickListener { view ->
             showSettingsBottomSheet()
         }
@@ -88,22 +86,19 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    // Handles the Open Settings menu on user click
     private fun showSettingsBottomSheet() {
         val dialog = BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.bottom_sheet_settings, null)
         dialog.setContentView(view)
 
-        // Handle "Edit Profile" Click
         view.findViewById<View>(R.id.btn_bs_edit).setOnClickListener {
-            dialog.dismiss() // Closes the settings menu
+            dialog.dismiss()
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
         }
 
-        // Handle "Log Out" Click
         view.findViewById<View>(R.id.btn_bs_logout).setOnClickListener {
             dialog.dismiss()
-            performLogout() // Calls the logout function
+            performLogout()
         }
 
         dialog.show()
@@ -113,7 +108,6 @@ class ProfileFragment : Fragment() {
         val authRepository = AuthRepository(requireContext())
         authRepository.logout()
 
-        // Clear back stack and navigate to Login
         val navOptions = NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build()

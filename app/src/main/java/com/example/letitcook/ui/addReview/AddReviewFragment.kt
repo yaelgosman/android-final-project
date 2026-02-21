@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.letitcook.BuildConfig
 import com.example.letitcook.R
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 import com.example.letitcook.databinding.FragmentAddReviewBinding
 import com.example.letitcook.models.entity.Post
 import com.example.letitcook.network.YelpClient

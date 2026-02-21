@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.letitcook.R
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {

@@ -7,7 +7,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.letitcook.databinding.ActivityMainBinding
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.repositories.AuthRepository
 
 class MainActivity : AppCompatActivity() {
 

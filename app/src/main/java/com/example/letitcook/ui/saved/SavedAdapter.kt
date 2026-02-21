@@ -28,7 +28,7 @@ class SavedAdapter(
     override fun onBindViewHolder(holder: SavedViewHolder, position: Int) {
         val post = posts[position]
         with(holder.binding) {
-            tvTitle.text = post.userName // Using userName as Restaurant name
+            tvTitle.text = post.userName
             tvSubtitle.text = post.location
             tvRating.text = post.rating.toString()
 
@@ -40,7 +40,6 @@ class SavedAdapter(
                     .into(ivPostImage)
             }
 
-            // Bookmark Click
             ivBookmark.setOnClickListener {
                 onBookmarkClick(post)
             }

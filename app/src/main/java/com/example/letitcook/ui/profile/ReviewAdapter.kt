@@ -33,10 +33,7 @@ class ReviewAdapter(
 
     class ReviewViewHolder(private val binding: ItemReviewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post, onActionClicked: (Post, PostAction) -> Unit) {
-            // Set Restaurant Name
-            binding.tvRestaurantName.text = post.location // if (post.location.isNotEmpty()) post.location else "Unknown Place"
-
-            // Set Content & Rating
+            binding.tvRestaurantName.text = post.location
             binding.tvReviewContent.text = post.description
             binding.rbReviewRating.rating = post.rating
 
@@ -59,7 +56,6 @@ class ReviewAdapter(
                 binding.ivReviewImage.visibility = View.GONE
             }
 
-            // Handle menu click
             binding.btnMenuOptions.setOnClickListener { view ->
                 showPopupMenu(view, post, onActionClicked)
             }

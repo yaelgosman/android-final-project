@@ -1,4 +1,4 @@
-package com.example.letitcook.data
+package com.example.letitcook.repositories
 
 import android.content.Context
 import android.net.Uri
@@ -24,7 +24,6 @@ class AuthRepository(private val context: Context) {
         return firebaseAuth.currentUser != null
     }
 
-    // Function to login
     suspend fun login(email: String, pass: String): Result {
         return try {
             firebaseAuth.signInWithEmailAndPassword(email, pass).await()
@@ -37,7 +36,6 @@ class AuthRepository(private val context: Context) {
         }
     }
 
-    // Function to register a user
     suspend fun register(email: String, pass: String, name: String, imageUri: Uri?): Result {
         return try {
             // this creates the user in Firebase Auth
@@ -54,11 +52,7 @@ class AuthRepository(private val context: Context) {
                 // Convert URI -> Rotated Byte array (to prevent android bugs where the image is saved ROTATED)
                 val data = ImageUtils.prepareImageForUpload(context, imageUri)
 
-
-                // Upload the ByteArray (instead of putFie)
                 storageRef.putBytes(data).await()
-
-                // Get the download URL
                 downloadUrl = storageRef.downloadUrl.await()
             }
 
@@ -77,19 +71,17 @@ class AuthRepository(private val context: Context) {
         }
     }
 
-    // Function to sign out the logged user
     fun logout() {
         firebaseAuth.signOut()
     }
 
-    // Function to update user profile details
     suspend fun updateUserProfile(name: String, imageUri: Uri?): Result {
         return try {
             val user = firebaseAuth.currentUser ?: return Result(success = false, errorMessage = "User not found")
 
             var downloadUrl: Uri? = user.photoUrl // Default to existing URL
 
-            // If a NEW image was picked, upload it
+            // If a new image was picked, upload it
             if (imageUri != null) {
                 val storageRef = storage.reference.child("profile_images/${user.uid}.jpg")
                 val imageData = ImageUtils.prepareImageForUpload(context, imageUri)

@@ -2,7 +2,7 @@ package com.example.letitcook.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 
 class ProfileViewModelFactory(private val repository: PostRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -1,4 +1,4 @@
-package com.example.letitcook.data
+package com.example.letitcook.repositories
 
 import android.content.Context
 import android.net.Uri
@@ -22,19 +22,16 @@ class PostRepository(private val context: Context) {
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
-    // Initialize Room
     private val postDao = AppLocalDb.database.postDao()
 
     private val POSTS_COLLECTION = "posts"
     private val USERS_COLLECTION = "users"
     private val SAVED_COLLECTION = "saved_posts"
 
-    // GET POSTS (Observe Local DB)
     fun getPostsFlow(): Flow<List<Post>> {
         return postDao.getAllPosts()
     }
 
-    // GET SAVED POSTS (Observe Local DB)
     fun getSavedPosts(): Flow<List<Post>> {
         return postDao.getSavedPosts()
     }
@@ -67,8 +64,7 @@ class PostRepository(private val context: Context) {
                     val post = doc.toObject(Post::class.java)
                     post?.id = doc.id
 
-                    // Force isSaved to be based ONLY on the user's personal list.
-                    // This prevents "Unsaving" issues if the global DB has 'true' by mistake.
+                    // Force isSaved to be based on the user's personal list.
                     post?.isSaved = savedIds.contains(post?.id)
 
                     post
@@ -84,7 +80,6 @@ class PostRepository(private val context: Context) {
         }
     }
 
-    // ADD POST
     suspend fun addPost(
         location: String,
         description: String,
@@ -118,10 +113,8 @@ class PostRepository(private val context: Context) {
                     timestamp = System.currentTimeMillis()
                 )
 
-                // Save to Firestore
                 val docRef = db.collection(POSTS_COLLECTION).add(newPost).await()
 
-                // Save to Room
                 val finalPost = newPost.copy(id = docRef.id)
                 postDao.insert(finalPost)
 
@@ -134,10 +127,8 @@ class PostRepository(private val context: Context) {
     }
 
     suspend fun deletePost(post: Post) {
-        // Delete from Room (Local)
         postDao.delete(post)
 
-        // Delete from Firestore (Cloud)
         FirebaseFirestore.getInstance().collection("posts").document(post.id).delete()
     }
 
@@ -145,13 +136,13 @@ class PostRepository(private val context: Context) {
         return try {
             var finalImageUrl = post.postImageUrl
 
-            // If the user picked a NEW image, upload it first
+            // If the user picked a new image, upload it first
             if (newImageUri != null) {
                 val filename = UUID.randomUUID().toString()
                 val ref = FirebaseStorage.getInstance().getReference("/images/$filename")
 
-                ref.putFile(newImageUri).await() // Upload
-                val downloadUrl = ref.downloadUrl.await() // Get URL
+                ref.putFile(newImageUri).await()
+                val downloadUrl = ref.downloadUrl.await()
                 finalImageUrl = downloadUrl.toString()
             }
 
@@ -183,10 +174,8 @@ class PostRepository(private val context: Context) {
     suspend fun toggleSave(post: Post) {
         val userId = auth.currentUser?.uid ?: return
 
-        // Calculate the new status (Flip it)
         val isNowSaved = !post.isSaved
 
-        // Create updated object
         val updatedPost = post.copy(isSaved = isNowSaved)
 
         // UPDATE ROOM (Local)

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 import com.example.letitcook.databinding.BottomSheetRestaurantBinding
 import com.example.letitcook.models.YelpRestaurant
 import com.example.letitcook.models.entity.Post

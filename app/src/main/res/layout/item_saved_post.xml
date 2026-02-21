@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- Food Image -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardImageContainer"
             android:layout_width="100dp"
@@ -42,9 +41,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/cookbook_red" />
-        <!-- Note: Create a drawable named ic_bookmark_filled or use a vector asset -->
 
-        <!-- Title: Restaurant Name -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
@@ -59,7 +56,6 @@
             app:layout_constraintStart_toEndOf="@id/cardImageContainer"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Subtitle: Location/Category -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
