@@ -1,5 +1,6 @@
 package com.example.letitcook.ui.search
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.letitcook.R
 import com.example.letitcook.databinding.FragmentSearchBinding
+import com.google.android.material.button.MaterialButton
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
@@ -30,7 +32,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private fun setupRecyclerView() {
         binding.rvRestaurants.layoutManager = LinearLayoutManager(context)
 
-        // Pass the click function
         adapter = SearchAdapter(emptyList()) { selectedRestaurant ->
             val bottomSheet = RestaurantDetailsBottomSheet(selectedRestaurant)
             bottomSheet.show(parentFragmentManager, "RestaurantDetails")
@@ -40,13 +41,12 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun setupLiveSearch() {
-        // This listens to every character typed
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Pass text to ViewModel immediately
-                // ViewModel handles the delay (waiting for user to stop typing)
+                // When typing manually, we might want to reset buttons or leave them as is.
+                // For now, we just search.
                 viewModel.onSearchQueryChanged(s.toString())
             }
 
@@ -55,25 +55,64 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun setupCategories() {
-        // Helper to handle clicks
-        val onCategoryClick = { query: String ->
-            binding.etSearch.setText(query) // Optional: Update text box
-            binding.etSearch.setSelection(query.length) // Move cursor to end
+        // 1. Define the list of all category buttons
+        val buttons = listOf(
+            binding.btnCatAll,
+            binding.btnCatItalian,
+            binding.btnCatAsian,
+            binding.btnCatBurgers
+        )
+
+        // 2. Define colors
+        val activeBgColor = android.graphics.Color.parseColor("#1A237E") // Dark Blue
+        val activeTextColor = android.graphics.Color.WHITE
+
+        val inactiveBgColor = android.graphics.Color.WHITE
+        val inactiveTextColor = android.graphics.Color.parseColor("#1A237E") // Dark Blue
+        val inactiveStrokeColor = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#E0E0E0")) // Light Gray
+
+        // 3. Helper function to update visuals
+        fun updateButtonVisuals(clickedBtn: com.google.android.material.button.MaterialButton) {
+            buttons.forEach { btn ->
+                if (btn.id == clickedBtn.id) {
+                    // === ACTIVE STATE ===
+                    // Make it filled Blue
+                    btn.setBackgroundColor(activeBgColor)
+                    btn.setTextColor(activeTextColor)
+                    btn.strokeWidth = 0 // Remove outline
+                } else {
+                    // === INACTIVE STATE ===
+                    // Make it Transparent with Outline
+                    btn.setBackgroundColor(inactiveBgColor)
+                    btn.setTextColor(inactiveTextColor)
+                    btn.strokeColor = inactiveStrokeColor
+                    btn.strokeWidth = 3 // Thickness of the outline (approx 1dp)
+                }
+            }
+        }
+
+        // 4. Click Logic
+        val onCategoryClick = { btn: com.google.android.material.button.MaterialButton, query: String ->
+            // Update the UI immediately
+            updateButtonVisuals(btn)
+
+            // Perform the search
+            binding.etSearch.setText(query)
+            binding.etSearch.setSelection(query.length)
             viewModel.searchCategory(query)
         }
 
-        binding.btnCatAll.setOnClickListener { onCategoryClick("Restaurant") }
-        binding.btnCatItalian.setOnClickListener { onCategoryClick("Italian") }
-        binding.btnCatAsian.setOnClickListener { onCategoryClick("Asian") }
-        binding.btnCatBurgers.setOnClickListener { onCategoryClick("Burger") }
+        // 5. Attach Listeners
+        binding.btnCatAll.setOnClickListener { onCategoryClick(binding.btnCatAll, "") }
+        binding.btnCatItalian.setOnClickListener { onCategoryClick(binding.btnCatItalian, "Italian") }
+        binding.btnCatAsian.setOnClickListener { onCategoryClick(binding.btnCatAsian, "Asian") }
+        binding.btnCatBurgers.setOnClickListener { onCategoryClick(binding.btnCatBurgers, "Burger") }
     }
 
     private fun observeViewModel() {
-        // 1. Update List
         viewModel.restaurants.observe(viewLifecycleOwner) { list ->
             adapter.updateList(list)
 
-            // Update the title dynamically
             val currentQuery = binding.etSearch.text.toString()
             if (currentQuery.isEmpty()) {
                 binding.tvTrending.text = "TRENDING NEARBY"
@@ -82,14 +121,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             }
         }
 
-        // 2. Show/Hide Loading Spinner
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
                 binding.progressBar.visibility = View.VISIBLE
-                binding.rvRestaurants.alpha = 0.5f // Fade list slightly
+                binding.rvRestaurants.alpha = 0.5f
             } else {
                 binding.progressBar.visibility = View.GONE
-                binding.rvRestaurants.alpha = 1.0f // Restore list
+                binding.rvRestaurants.alpha = 1.0f
             }
         }
     }

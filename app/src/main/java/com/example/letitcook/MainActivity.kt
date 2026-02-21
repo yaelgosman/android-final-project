@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         binding.fabAdd.setOnClickListener {
-            navController.navigate(R.id.addReviewFragment)
+            val action = NavGraphDirections.actionGlobalAddReviewFragment(post = null)
+            navController.navigate(action)
         }
 
         //disable navbar in these pages

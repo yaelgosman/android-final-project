@@ -47,6 +47,16 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (email.isBlank() || password.isBlank()) {
                 Toast.makeText(requireContext(), "Email and Password cannot be empty", Toast.LENGTH_SHORT).show()
             } else {
+                // Show the progress bar and disable the button before network request - so the user wont be able to spam it
+                binding.progressBar.visibility = View.VISIBLE
+                binding.btnLogin.isEnabled = false
+                binding.btnLogin.alpha = 0.5f
+
+                // Disable the input fields when loader is active
+                binding.etEmail.isEnabled = false
+                binding.etPassword.isEnabled = false
+                binding.tvSignUp.isEnabled = false
+
                 authViewModel.login(email, password)
             }
         }
@@ -63,6 +73,18 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         // Checks if the login was successful
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
+
+            // Hides the progress bar and re-enable the button as soon as we get a result
+            // whether its a success and navigates to the nome page. or a failure and lets the user to enter different credentials
+            binding.progressBar.visibility = View.GONE
+            binding.btnLogin.isEnabled = true
+            binding.btnLogin.alpha = 1.0f
+
+            // Re-enable input fields after loader finish
+            binding.etEmail.isEnabled = true
+            binding.etPassword.isEnabled = true
+            binding.tvSignUp.isEnabled = true
+
             if (result.success) {
                 try {
 

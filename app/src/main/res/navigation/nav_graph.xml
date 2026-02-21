@@ -5,6 +5,10 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
+    <action
+        android:id="@+id/action_global_addReviewFragment"
+        app:destination="@id/addReviewFragment" />
+
     <!-- Auth Screens -->
     <fragment
         android:id="@+id/loginFragment"
