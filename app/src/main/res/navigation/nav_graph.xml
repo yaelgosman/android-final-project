@@ -5,7 +5,10 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-    <!-- Auth Screens -->
+    <action
+        android:id="@+id/action_global_addReviewFragment"
+        app:destination="@id/addReviewFragment" />
+
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.letitcook.ui.auth.LoginFragment"
@@ -16,7 +19,6 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
-        <!-- prevents the user to go back to the login page when the user is logged in -->
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
@@ -37,7 +39,6 @@
             app:destination="@id/loginFragment" />
     </fragment>
 
-    <!-- Main Screens (Bottom Nav) -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.letitcook.ui.feed.HomeFragment"
@@ -47,17 +48,13 @@
         android:id="@+id/searchFragment"
         android:name="com.example.letitcook.ui.search.SearchFragment"
         android:label="Search">
-        <!-- מאפשר מעבר לפרטי מסעדה -->
-<!--        <action-->
-<!--            android:id="@+id/action_search_to_details"-->
-<!--            app:destination="@id/restaurantDetailsFragment" />-->
     </fragment>
 
 
-<!--    <fragment-->
-<!--        android:id="@+id/savedFragment"-->
-<!--        android:name="com.example.letitcook.ui.saved.SavedFragment"-->
-<!--        android:label="Saved" />-->
+    <fragment
+        android:id="@+id/savedFragment"
+        android:name="com.example.letitcook.ui.saved.SavedFragment"
+        android:label="Saved" />
 
     <fragment
         android:id="@+id/profileFragment"
@@ -72,6 +69,10 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_addPostFragment"
+            app:destination="@id/addReviewFragment" />
     </fragment>
 
     <fragment
@@ -80,16 +81,15 @@
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
 
-    <!-- Add Review Screen (נפתח מהכפתור האדום) -->
     <fragment
         android:id="@+id/addReviewFragment"
         android:name="com.example.letitcook.ui.addReview.AddReviewFragment"
-        android:label="Add Review" />
+        android:label="Add Review">
 
-    <!-- Placeholder for Details if needed -->
-<!--    <fragment-->
-<!--        android:id="@+id/restaurantDetailsFragment"-->
-<!--        android:name="com.example.letitcook.ui.details.RestaurantDetailsFragment"-->
-<!--        android:label="Details" />-->
-
+        <argument
+            android:name="post"
+            app:argType="com.example.letitcook.models.entity.Post"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 </navigation>

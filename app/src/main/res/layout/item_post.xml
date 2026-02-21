@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
-    app:cardCornerRadius="12dp"
     android:layout_marginHorizontal="16dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,70 +16,92 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivAvatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="16dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="12dp"
             android:src="@drawable/ic_launcher_background"
+            app:civ_border_width="1dp"
+            app:civ_border_color="#E0E0E0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvUserName"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Guy Levi"
-            android:textStyle="bold"
-            android:textColor="@color/black"
+            android:orientation="vertical"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatar"
+            app:layout_constraintEnd_toStartOf="@+id/tvRating"
             app:layout_constraintStart_toEndOf="@id/ivAvatar"
-            app:layout_constraintTop_toTopOf="@id/ivAvatar" />
+            app:layout_constraintTop_toTopOf="@id/ivAvatar">
 
-        <TextView
-            android:id="@+id/tvLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Burger Saloon • Tel Aviv"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@id/tvUserName"
-            app:layout_constraintTop_toBottomOf="@id/tvUserName" />
+            <TextView
+                android:id="@+id/tvUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guy Levi"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#182A48" />
+
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Burger Saloon • Tel Aviv"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9.5 / 10"
-            android:background="@drawable/bg_red_button"
-            android:backgroundTint="@color/green_rating"
-            android:textColor="@color/white"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:textSize="12sp"
-            android:layout_marginEnd="16dp"
+            android:text="9.5"
+            android:background="@drawable/bg_filter_active"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/ivAvatar"
-            app:layout_constraintBottom_toBottomOf="@id/tvUserName"/>
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatar"/>
 
-        <!-- תמונה ראשית -->
-        <ImageView
-            android:id="@+id/ivPostImage"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardImage"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:layout_marginTop="12dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_foreground"
-            app:layout_constraintTop_toBottomOf="@id/ivAvatar" />
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintTop_toBottomOf="@id/ivAvatar">
 
-        <!-- icons -->
+            <ImageView
+                android:id="@+id/ivPostImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_foreground" />
+        </androidx.cardview.widget.CardView>
+
         <ImageView
-            android:id="@+id/btnLike"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:id="@+id/btnSavePost"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="12dp"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/ic_launcher_foreground"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivPostImage" />
-        <!-- הערה: תחליפי ב-Drawable של לב -->
+            android:layout_marginEnd="12dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_bookmark_outlined"
+            app:tint="#182A48"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardImage" />
 
         <TextView
             android:id="@+id/tvDescription"
@@ -86,11 +109,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginHorizontal="16dp"
-            android:text="The best burger I had..."
-            android:textColor="@color/black"
+            android:text="The best burger I had... really juicy and the fries were crispy!"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnLike" />
+            app:layout_constraintEnd_toStartOf="@id/btnSavePost"
+            app:layout_constraintTop_toBottomOf="@id/cardImage"
+            app:layout_constraintBottom_toBottomOf="@id/btnSavePost"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

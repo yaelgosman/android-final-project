@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
+import com.example.letitcook.repositories.AuthRepository
 import com.example.letitcook.databinding.FragmentEditProfileBinding
 import com.example.letitcook.utils.ImageUtils
 import com.google.firebase.auth.FirebaseAuth

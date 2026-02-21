@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.letitcook.R
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.letitcook.data.PostRepository
+import com.example.letitcook.repositories.PostRepository
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -22,7 +22,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
         val recycler = view.findViewById<RecyclerView>(R.id.postsRecyclerView)
-        val adapter = PostsAdapter(emptyList())
+        val adapter = PostsAdapter(emptyList()) { post ->
+            viewModel.toggleSave(post)
+        }
 
         recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(requireContext())

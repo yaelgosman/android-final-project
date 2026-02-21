@@ -7,10 +7,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.letitcook.databinding.ActivityMainBinding
-import com.example.letitcook.R
-import com.example.letitcook.data.AuthRepository
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.example.letitcook.repositories.AuthRepository
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,10 +33,8 @@ class MainActivity : AppCompatActivity() {
         val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
 
         if (authRepository.isUserLoggedIn()) {
-            // User is logged in -> start at Home page
             navGraph.setStartDestination(R.id.homeFragment)
         } else {
-            // User is NOT logged in -> Start at Login page
             navGraph.setStartDestination(R.id.loginFragment)
         }
 
@@ -48,7 +43,8 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         binding.fabAdd.setOnClickListener {
-            navController.navigate(R.id.addReviewFragment)
+            val action = NavGraphDirections.actionGlobalAddReviewFragment(post = null)
+            navController.navigate(action)
         }
 
         //disable navbar in these pages
